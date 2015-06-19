@@ -70,23 +70,25 @@ function processData(error, results) {
 }
 
 function loadData(file, year, callback) {
-    console.log(file);
-    console.log(year);
     d3.csv(file,
         function (d) {
-            return {
-                year: year,
-                round: d.Round,
-                date: Date.parse(d.Date),
-                time: new Date(d.Time),
-                homeTeam: d["Home Team"],
-                awayTeam: d["Away Team"],
-                venue: d.Venue
+            var format = d3.time.format("%Y %A %e %B %H:%M %p");
+            var datetime = format.parse(year + " " + d.Date + " " + d.Time);
+            if(datetime){
+                return {
+                    year: year,
+                    round: d.Round,
+                    datetime: datetime,
+                    homeTeam: d["Home Team"],
+                    awayTeam: d["Away Team"],
+                    venue: d.Venue
+                }
             }
+            
         },
         function (data) {
-            console.log(data);
-            callback(null, year);
+            //console.log(data);
+            callback(null, data);
         })
 
     
