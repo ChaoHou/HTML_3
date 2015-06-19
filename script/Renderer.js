@@ -55,8 +55,8 @@ function render(data, titleData) {
 
     force.on("tick", function (e) {
         //calculateFixedPos(data);
-        title.each(graviry(e.alpha * 0.2)).attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
-        nodes.each(graviry(e.alpha * 0.2))
+        title.each(graviry(e.alpha * 0.3)).attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
+        nodes.each(graviry(e.alpha * 0.3))
             .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
     })
 

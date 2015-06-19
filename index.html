@@ -33,20 +33,24 @@
     </style>
 </head>
 <body>
-    <script>
-        //static data
-        var height = 800, width = 1200, poolHeight = 60,
-            nodeHeight = 26, textHeight = 12, charWidth = 8,
-            offsetTop = 80, offsetLeft = offsetRight = 50,
-            widthLimit = width - offsetLeft - offsetRight,
-            nodeGap = 8, groupGap = 40,
-            titleOffset = 10, titleHeight = 24;
-
-
-
-    </script>
     <script src="script/Renderer.js"></script>
     <script src="script/DataProcessor.js"></script>
-    
+    <script>
+    //static data
+    var height = 800, width = 1200, poolHeight = 60,
+        nodeHeight = 26, textHeight = 12, charWidth = 8,
+        offsetTop = 80, offsetLeft = offsetRight = 50,
+        widthLimit = width - offsetLeft - offsetRight,
+        nodeGap = 8, groupGap = 40,
+        titleOffset = 10, titleHeight = 24;
+
+    load(function (error, results) {
+        var data = processData(results);
+
+        render(data[0], data[1]);
+    })
+
+    </script>
+
 </body>
 </html>

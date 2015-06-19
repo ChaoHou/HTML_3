@@ -1,13 +1,15 @@
-queue()
+function load(start) {
+    return queue()
     .defer(loadData, "data/2008-Table1.csv", 2008)
     .defer(loadData, "data/2009-Table1.csv", 2009)
     .defer(loadData, "data/2010-Table1.csv", 2010)
     .defer(loadData, "data/2011-Table1.csv", 2011)
     .defer(loadData, "data/2012-Table1.csv", 2012)
     .defer(loadData, "data/2013-Table1.csv", 2013)
-    .awaitAll(processData);
+    .awaitAll(start);
+}
 
-function processData(error, results) {
+function processData(results) {
 
     var teamMap = {
         "Adelaide Thunderbirds": "Australia",
@@ -50,7 +52,8 @@ function processData(error, results) {
 
     var titleData = generateTitles(data);
 
-    render(data, titleData);
+    return [data,titleData];
+    //render(data, titleData);
 }
 
 function loadData(file, year, callback) {
