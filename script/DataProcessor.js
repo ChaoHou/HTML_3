@@ -1,6 +1,10 @@
 queue()
     .defer(loadData, "data/2008-Table1.csv", 2008)
     .defer(loadData, "data/2009-Table1.csv", 2009)
+    .defer(loadData, "data/2010-Table1.csv", 2010)
+    .defer(loadData, "data/2011-Table1.csv", 2011)
+    .defer(loadData, "data/2012-Table1.csv", 2012)
+    .defer(loadData, "data/2013-Table1.csv", 2013)
     .awaitAll(processData);
 
 function processData(error, results) {
@@ -72,13 +76,15 @@ function processData(error, results) {
 function loadData(file, year, callback) {
     d3.csv(file,
         function (d) {
-            var format = d3.time.format("%Y %A %e %B %H:%M %p");
-            var datetime = format.parse(year + " " + d.Date + " " + d.Time);
+            var date = d.Date.split(/[\s,]+/);
+            var format = d3.time.format("%Y %e %B");
+            var datetime = format.parse(year + " " + date[1] + " " + date[2]);
+
             if(datetime){
                 return {
                     year: year,
                     round: d.Round,
-                    datetime: datetime,
+                    date: datetime,
                     homeTeam: d["Home Team"],
                     awayTeam: d["Away Team"],
                     venue: d.Venue
