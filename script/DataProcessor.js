@@ -50,10 +50,7 @@ function processData(results) {
     var data = teams.concat(countries, years, graphs, venues);
     height = calculateFixedPos(data) + groupGap + nodeHeight;
 
-    var titleData = generateTitles(data);
-
-    return [data,titleData];
-    //render(data, titleData);
+    return data;
 }
 
 function loadData(file, year, callback) {

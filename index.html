@@ -46,8 +46,9 @@
 
     load(function (error, results) {
         var data = processData(results);
+        var titleData = generateTitles(data);
 
-        render(data[0], data[1]);
+        render(data, titleData);
     })
 
     </script>
