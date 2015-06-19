@@ -54,7 +54,7 @@ function render(data, titleData) {
                     .text(function (d) { return d.text });
 
     force.on("tick", function (e) {
-        calculateFixedPos(data);
+        //calculateFixedPos(data);
         title.each(graviry(e.alpha * 0.2)).attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
         nodes.each(graviry(e.alpha * 0.2))
             .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
