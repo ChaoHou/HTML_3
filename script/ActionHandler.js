@@ -1,8 +1,8 @@
-function appendHandlers(renderer, graphPad) {
+function appendHandlers(data, renderer, graphPad) {
 
     renderer.force.on("tick", function (e) { tick(e, renderer);})
 
-    renderer.pool.on("click", function () { poolClick(graphPad); });
+    renderer.pool.on("click", function () { poolClick(data, graphPad); });
 
     graphPad.closeButton.on("click", function () { graphPadCloseButtonClick(graphPad); })
 }
@@ -11,7 +11,7 @@ function graphPadCloseButtonClick(graphPad) {
     graphPad.pad.style("display", "none");
 }
 
-function poolClick(graphPad) {
+function poolClick(data, graphPad) {
     graphPad.pad.style("display", "block");
 }
 
