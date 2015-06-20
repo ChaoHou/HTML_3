@@ -1,4 +1,4 @@
-function appendHandlers(renderer) {
+function appendHandlers(renderer, graphPad) {
 
     renderer.force.on("tick", function (e) {
         //calculateFixedPos(data);

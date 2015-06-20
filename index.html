@@ -35,6 +35,7 @@
 <body>
     <script src="script/Renderer.js"></script>
     <script src="script/DataProcessor.js"></script>
+    <script src="script/GraphPad.js"></script>
     <script src="script/ActionHandler.js"></script>
     <script>
     //static data
@@ -50,8 +51,9 @@
         var titleData = generateTitles(data);
 
         var renderer = new Renderer(data, titleData);
+        var graphPad = new GraphPad();
 
-        appendHandlers(renderer);
+        appendHandlers(renderer,graphPad);
     })
 
     </script>
