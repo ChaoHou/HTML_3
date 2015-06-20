@@ -23,6 +23,9 @@ function poolClick(data, graphPad) {
     graphPad.pad.style("display", "block");
 }
 
+/*
+    will be called every frame
+*/
 function tick(e, renderer) {
     renderer.nodes.each(tickNode(e.alpha * 0.3))
                 .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
