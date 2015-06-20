@@ -13,10 +13,12 @@ function appendHandlers(filters, data, renderer, graphPad) {
 function graphPadCloseButtonClick(graphPad) {
     graphPad.pad.style("display", "none");
 }
-
+/*
+    
+*/
 function poolClick(filters, graphPad) {
     
-    var selectNodes = getSelectFilters(filters);
+    var selectFilters = getSelectFilters(filters);
 
     graphPad.pad.style("display", "block");
 }
@@ -60,6 +62,16 @@ function isInPool(d) {
     return d.y > 0 && d.y < poolHeight - nodeHeight;
 }
 
+/*
+    return value format:
+        array of object:
+            { 
+            type: "type",
+            text:"text"
+            }
+            type includes: team, country, year, graph, venue
+            text is the displaying names
+*/
 function getSelectFilters(filters) {
     var selectedNodes = [];
     for (var i = 0; i < filters.length; i++) {
@@ -70,6 +82,19 @@ function getSelectFilters(filters) {
     return selectedNodes;
 }
 
+/*
+    return value format:
+        array of object:
+            {
+            year:2008,
+            round:1,
+            datetime:
+            datetime,
+            homeTeam:"homeTeam",
+            awayTeam:"awayTeam",
+            venue:"venue"
+            }
+*/
 function applyFilters(filters, data) {
     var filteredData = [];
 
