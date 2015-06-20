@@ -147,6 +147,20 @@ function generateTitles(data) {
 }
 
 /*
+    the data will be loaded into a 2D array
+    this will merge 2D array into 1D
+*/
+function mergeResults(results) {
+    var data = [];
+    for (var i = 0; i < results.length; i++) {
+        for (var j = 0; j < results[0].length; j++) {
+            data.push(results[i][j]);
+        }
+    }
+    return data;
+}
+
+/*
     calculate text width for drawing
 */
 function textLength(text) {

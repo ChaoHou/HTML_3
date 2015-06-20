@@ -25,11 +25,12 @@
         //data loaded
         var filters = processData(results);
         var titleData = generateTitles(filters);
+        var data = mergeResults(results);
 
         var renderer = new Renderer(filters, titleData);
         var graphPad = new GraphPad();
 
-        appendHandlers(filters, results, renderer, graphPad);
+        appendHandlers(filters, data, renderer, graphPad);
     })
 
     </script>

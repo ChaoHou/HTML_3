@@ -32,6 +32,9 @@ function tick(e, filters, data, renderer) {
     renderer.resultText.text("Result: "+filteredData.length);
 }
 
+/*
+    place filters in the pool one after one
+*/
 function tickNode(alpha) {
     var x = offsetLeft, y = (poolHeight - nodeHeight) / 2;
     return function (d) {
@@ -66,5 +69,28 @@ function getSelectFilters(filters) {
 
 function applyFilters(filters,data) {
     var selectFilters = getSelectFilters(filters);
-    return data;
+    var filteredData = [];
+
+    for (var i = 0; i < data.length; i++) {
+        if (applyFiltersToSingleRecord(selectFilters, data[i])) {
+            //pass all the filters
+            filteredData.push(data[i]);
+        }
+    }
+
+    return filteredData;
+}
+
+function applyFiltersToSingleRecord(filters, record) {
+    for (var i = 0; i < filters.length; i++) {
+        if (filters[i].type == "team") {
+            if (record.homeTeam != filters[i].text || record.homeTeam != filters[i].text) {
+                return false;
+            }
+        }
+        if (record[filters[i].type] != filters[i].text) {
+            return false;
+        }
+    }
+    return true;
 }
