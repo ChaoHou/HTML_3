@@ -18,17 +18,18 @@
         offsetTop = 80, offsetLeft = offsetRight = 50,
         widthLimit = width - offsetLeft - offsetRight,
         nodeGap = 8, groupGap = 40,
-        titleOffset = 10, titleHeight = 24;
+        titleOffset = 10, titleHeight = 24,
+        resultTextX = width - 100;
 
     load(function (error, results) {
         //data loaded
-        var data = processData(results);
-        var titleData = generateTitles(data);
+        var filters = processData(results);
+        var titleData = generateTitles(filters);
 
-        var renderer = new Renderer(data, titleData);
+        var renderer = new Renderer(filters, titleData);
         var graphPad = new GraphPad();
 
-        appendHandlers(data,renderer,graphPad);
+        appendHandlers(filters, results, renderer, graphPad);
     })
 
     </script>

@@ -1,11 +1,11 @@
 /*
     Append action handler to renderer and graphPad
 */
-function appendHandlers(data, renderer, graphPad) {
+function appendHandlers(filters, data, renderer, graphPad) {
 
-    renderer.force.on("tick", function (e) { tick(e, renderer);})
+    renderer.force.on("tick", function (e) { tick(e, filters, data, renderer);})
 
-    renderer.pool.on("click", function () { poolClick(data, graphPad); });
+    renderer.pool.on("click", function () { poolClick(filters, graphPad); });
 
     graphPad.closeButton.on("click", function () { graphPadCloseButtonClick(graphPad); })
 }
@@ -14,14 +14,9 @@ function graphPadCloseButtonClick(graphPad) {
     graphPad.pad.style("display", "none");
 }
 
-function poolClick(data, graphPad) {
-    var selectedNodes = [];
-    for (var i = 0; i < data.length; i++) {
-        if (isInPool(data[i])) {
-            selectedNodes.push(data[i]);
-        }
-    }
-    console.log(selectedNodes.length);
+function poolClick(filters, graphPad) {
+    
+    var selectNodes = getSelectNodes(filters);
 
     graphPad.pad.style("display", "block");
 }
@@ -29,9 +24,12 @@ function poolClick(data, graphPad) {
 /*
     will be called every frame
 */
-function tick(e, renderer) {
+function tick(e, filters, data, renderer) {
     renderer.nodes.each(tickNode(e.alpha * 0.3))
                 .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+    var filteredData = applyFilters(filters, data);
+    renderer.resultText.text("Result: "+filteredData.length);
 }
 
 function tickNode(alpha) {
@@ -53,6 +51,20 @@ function tickNode(alpha) {
 }
 
 function isInPool(d) {
-    //console.log(d.y);
     return d.y > 0 && d.y < poolHeight - nodeHeight;
+}
+
+function getSelectNodes(filters) {
+    var selectedNodes = [];
+    for (var i = 0; i < filters.length; i++) {
+        if (isInPool(filters[i])) {
+            selectedNodes.push(filters[i]);
+        }
+    }
+    return selectedNodes;
+}
+
+function applyFilters(filters,data) {
+
+    return data;
 }

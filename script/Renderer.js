@@ -58,7 +58,13 @@ function Renderer(data, titleData) {
                     .text(function (d) { return d.text })
                     .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });;
 
-
+    this.resultText = this.svg.append("text")
+                                .attr("class", "result")
+                                .style("font-size", textHeight)
+                                .style("font-family", "Impact")
+                                .attr("x", resultTextX)
+                                .attr("y", 100)
+                                .text("result:");
 }
 
 /*
