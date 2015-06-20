@@ -30,14 +30,14 @@ function Renderer(data, titleData) {
                 .call(this.force.drag);
 
     this.nodes.append("rect")
-        .attr("width", function (d) { return d.width + nodeHeight / 2; })
+        .attr("width", function (d) { return d.width; })
         .attr("height", nodeHeight)
         .style("fill", function (d) { return d.color })
 
     this.nodes.append("text")
         .style("font-size", textHeight)
         .style("font-family", "Impact")
-        .attr("textLength", function (d) { return d.width; })
+        .attr("textLength", function (d) { return d.textLength; })
         .attr("dy", function (d, i) { return textHeight / 2; })
         .attr("x", nodeHeight / 4)
         .attr("y", nodeHeight / 2)
@@ -51,7 +51,8 @@ function Renderer(data, titleData) {
                     .attr("class", ".title")
                     .style("font-size", titleHeight)
                     .style("font-family", "Impact")
-                    .text(function (d) { return d.text });
+                    .text(function (d) { return d.text })
+    .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });;
 
 
 }
@@ -71,10 +72,10 @@ function calculateFixedPos(array) {
                 continue;
             }
 
-            var newWidth = x + array[i].width + nodeHeight / 2 + nodeGap
-                            + array[i + 1].width + nodeHeight / 2 - offsetLeft;
+            var newWidth = x + array[i].width + nodeGap
+                            + array[i + 1].width - offsetLeft;
             if (newWidth <= widthLimit) {
-                x = x + array[i].width + nodeHeight / 2 + nodeGap;
+                x = x + array[i].width + nodeGap;
             } else {
                 x = offsetLeft;
                 y = y + nodeGap + nodeHeight;
@@ -91,6 +92,8 @@ function initializePos(data){
     for (var i = 0; i < data.length; i++) {
         data[i].x = data[i].fixedX;
         data[i].y = data[i].fixedY;
+        data[i].originalX = data[i].fixedX;
+        data[i].originalY = data[i].fixedY;
     }
 }
 

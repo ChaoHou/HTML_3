@@ -99,7 +99,8 @@ function initArray(data, color, type, group) {
         data[i].color = color;
         data[i].type = type;
         data[i].index = i;
-        data[i].width = textLength(data[i].text);
+        data[i].textLength = textLength(data[i].text)
+        data[i].width = data[i].textLength + nodeHeight / 2;
         data[i].group = group;
     }
     return data;
