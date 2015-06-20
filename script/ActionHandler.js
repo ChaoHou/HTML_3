@@ -84,12 +84,13 @@ function applyFilters(filters,data) {
 function applyFiltersToSingleRecord(filters, record) {
     for (var i = 0; i < filters.length; i++) {
         if (filters[i].type == "team") {
-            if (record.homeTeam != filters[i].text || record.homeTeam != filters[i].text) {
+            if (record.homeTeam != filters[i].text && record.awayTeam != filters[i].text) {
                 return false;
             }
-        }
-        if (record[filters[i].type] != filters[i].text) {
-            return false;
+        } else {
+            if (record[filters[i].type] != filters[i].text) {
+                return false;
+            }
         }
     }
     return true;
