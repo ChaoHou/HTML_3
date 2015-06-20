@@ -17,8 +17,11 @@ function graphPadCloseButtonClick(graphPad) {
 function poolClick(data, graphPad) {
     var selectedNodes = [];
     for (var i = 0; i < data.length; i++) {
-        selectedNodes.push()
+        if (isInPool(data[i])) {
+            selectedNodes.push(data[i]);
+        }
     }
+    console.log(selectedNodes.length);
 
     graphPad.pad.style("display", "block");
 }
