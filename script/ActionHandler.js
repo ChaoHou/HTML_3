@@ -16,7 +16,7 @@ function graphPadCloseButtonClick(graphPad) {
 
 function poolClick(filters, graphPad) {
     
-    var selectNodes = getSelectNodes(filters);
+    var selectNodes = getSelectFilters(filters);
 
     graphPad.pad.style("display", "block");
 }
@@ -54,7 +54,7 @@ function isInPool(d) {
     return d.y > 0 && d.y < poolHeight - nodeHeight;
 }
 
-function getSelectNodes(filters) {
+function getSelectFilters(filters) {
     var selectedNodes = [];
     for (var i = 0; i < filters.length; i++) {
         if (isInPool(filters[i])) {
@@ -65,6 +65,6 @@ function getSelectNodes(filters) {
 }
 
 function applyFilters(filters,data) {
-
+    var selectFilters = getSelectFilters(filters);
     return data;
 }

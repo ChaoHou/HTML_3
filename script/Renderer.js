@@ -63,7 +63,7 @@ function Renderer(data, titleData) {
                                 .style("font-size", textHeight)
                                 .style("font-family", "Impact")
                                 .attr("x", resultTextX)
-                                .attr("y", 100)
+                                .attr("y", poolHeight - nodeGap)
                                 .text("result:");
 }
 
