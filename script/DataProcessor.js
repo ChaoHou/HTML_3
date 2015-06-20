@@ -25,15 +25,15 @@ function processData(results) {
     };
 
     var teams = constructFromProperty(results,"homeTeam","awayTeam");
-    initArray(teams, "yellow", "team", 0);
+    initArray(teams, "team", 0);
 
     var countries = [{ "text": "New Zealand" },
                     { "text": "Australia" }];
-    initArray(countries, "aquamarine", "country", 1);
+    initArray(countries, "country", 1);
 
     var years = constructFromProperty(results, "year", null);
 
-    initArray(years, "bisque", "year", 2);
+    initArray(years, "year", 2);
 
     var graphs =
         [
@@ -42,10 +42,10 @@ function processData(results) {
             { "text": "Pie chart" },
             { "text": "table" }
         ];
-    initArray(graphs, "Green", "graph", 3);
+    initArray(graphs, "graph", 3);
 
     var venues = constructFromProperty(results, "venue", null);
-    initArray(venues, "orange", "venue", 4);
+    initArray(venues, "venue", 4);
 
     var data = teams.concat(countries, years, graphs, venues);
     height = calculateFixedPos(data) + groupGap + nodeHeight;
@@ -94,9 +94,8 @@ function constructFromProperty(data, p1, p2) {
     return r.sort(function (a, b) { return a.text.toString().localeCompare(b.text); });
 }
 
-function initArray(data, color, type, group) {
+function initArray(data, type, group) {
     for (var i = 0; i < data.length; i++) {
-        data[i].color = color;
         data[i].type = type;
         data[i].index = i;
         data[i].textLength = textLength(data[i].text)

@@ -11,7 +11,7 @@ function Renderer(data, titleData) {
     this.pool = this.svg.append("rect")
                 .attr("x", 0)
                 .attr("y", 0)
-                .attr("fill", "purple")
+                //.attr("fill", "purple")
                 .attr("width", width)
                 .attr("height", poolHeight)
                 .attr("id", "pool");
@@ -32,7 +32,8 @@ function Renderer(data, titleData) {
     this.nodes.append("rect")
         .attr("width", function (d) { return d.width; })
         .attr("height", nodeHeight)
-        .style("fill", function (d) { return d.color })
+        .attr("class", function (d) { return d.type;})
+        //.style("fill", function (d) { return d.color })
 
     this.nodes.append("text")
         .style("font-size", textHeight)
@@ -41,7 +42,7 @@ function Renderer(data, titleData) {
         .attr("dy", function (d, i) { return textHeight / 2; })
         .attr("x", nodeHeight / 4)
         .attr("y", nodeHeight / 2)
-        .attr("fill", "black")
+        //.attr("fill", "black")
         .text(function (d) { return d.text; })
 
     this.title = this.svg.selectAll(".title")
@@ -52,7 +53,7 @@ function Renderer(data, titleData) {
                     .style("font-size", titleHeight)
                     .style("font-family", "Impact")
                     .text(function (d) { return d.text })
-    .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });;
+                    .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });;
 
 
 }

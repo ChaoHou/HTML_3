@@ -1,0 +1,49 @@
+body {
+    margin : 0;
+    padding : 0;
+    border : 0;
+}
+text {
+    pointer-events: none;
+    cursor: pointer;
+}
+
+.line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+}
+
+.axis {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+#pool {
+    fill: Aquamarine;
+}
+
+#pool:hover {
+    fill: GoldenRod;
+}
+
+.team {
+    fill: yellow;
+}
+
+.country {
+    fill: Chartreuse;
+}
+
+.year {
+    fill: Coral;
+}
+
+.graph {
+    fill: DarkSeaGreen;
+}
+
+.venue {
+    fill: LightSkyBlue;
+}
