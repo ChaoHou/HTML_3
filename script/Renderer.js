@@ -24,11 +24,16 @@ function Renderer(data, titleData) {
                           .gravity(0)
                           .start();
 
+    var drag = d3.behavior.drag()
+                    .on("dragstart", dragStart)
+                    .on("drag", dragMove)
+                    .on("dragend", dragEnd);
+
     this.nodes = this.svg.selectAll("g")
                 .data(data)
                 .enter()
                 .append("g")
-                .call(this.force.drag);
+                .call(drag);
 
     this.nodes.append("rect")
         .attr("width", function (d) { return d.width; })
@@ -104,4 +109,14 @@ function initializePos(data){
     }
 }
 
+function dragStart(d, i) {
+    
+}
 
+function dragMove(d, i) {
+
+}
+
+function dragEnd(d, i) {
+
+}
