@@ -3,11 +3,41 @@
 */
 function appendHandlers(filters, data, renderer, graphPad) {
 
+    renderer.nodes.call(drag(filters, data, renderer))
+    //renderer.nodes.call(renderer.force.drag)
     renderer.force.on("tick", function (e) { tick(e, filters, data, renderer);})
 
     renderer.pool.on("click", function () { poolClick(filters, data, graphPad); });
 
     graphPad.closeButton.on("click", function () { graphPadCloseButtonClick(graphPad); })
+}
+
+function drag(filters, data, renderer) {
+    return d3.behavior.drag()
+                    .on("dragstart", function (d, i) { dragStart(renderer); })
+                    .on("drag", function (d, i) { dragMove(d, filters, data, renderer); })
+                    .on("dragend", function (d, i) { dragEnd(d, filters, data, renderer); });
+}
+
+function dragStart(renderer) {
+    renderer.force.stop();
+}
+
+function dragMove(d, filters, data, renderer) {
+    if (d.fixed) {
+        return;
+    }
+    d.px += d3.event.dx;
+    d.py += d3.event.dy;
+    d.x += d3.event.dx;
+    d.y += d3.event.dy;
+
+    renderer.nodes.attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; })
+}
+
+function dragEnd(d, filters, data, renderer) {
+    renderer.nodes.attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; })
+    renderer.force.resume();
 }
 
 function graphPadCloseButtonClick(graphPad) {
@@ -139,7 +169,7 @@ function applyFiltersToSingleRecord(filters, record) {
 }
 
 function disableFilter(filters, data, d) {
-    //d.disabled = false;
+    d.fixed = false;
     if (filters.length == 0) {
         return false;
     }
@@ -157,6 +187,6 @@ function disableFilter(filters, data, d) {
 
         }
     }
-    //d.disabled = true;
+    d.fixed = true;
     return true;
 }
