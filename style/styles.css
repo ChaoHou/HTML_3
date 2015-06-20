@@ -3,7 +3,12 @@ body {
     padding : 0;
     border : 0;
 }
+
+svg {
+    position: absolute;
+}
 text {
+    font-family: Impact;
     pointer-events: none;
     cursor: pointer;
 }
@@ -46,4 +51,13 @@ text {
 
 .venue {
     fill: LightSkyBlue;
+}
+
+.title {
+    font-size: 24px;
+    font-family: Impact
+}
+
+.disable {
+    opacity: 0.5;
 }

@@ -4,7 +4,6 @@ function GraphPad() {
 					.attr("id", "pad")
 					.attr("height", height)
 					.attr("width", width)
-					.style("position", "absolute")
 					.style("display", "none");
     this.pad = pad;
 

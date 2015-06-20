@@ -8,13 +8,11 @@ function Renderer(data, titleData) {
             .append("svg")
             .attr("id", "svg")
             .attr("height", height)
-            .attr("width", width)
-            .style("position", "absolute");
+            .attr("width", width);
 
     this.pool = this.svg.append("rect")
                 .attr("x", 0)
                 .attr("y", 0)
-                //.attr("fill", "purple")
                 .attr("width", width)
                 .attr("height", poolHeight)
                 .attr("id", "pool");
@@ -35,31 +33,26 @@ function Renderer(data, titleData) {
     this.nodes.append("rect")
         .attr("width", function (d) { return d.width; })
         .attr("height", nodeHeight)
-        .attr("class", function (d) { return d.type;})
-        //.style("fill", function (d) { return d.color })
+        .attr("class", function (d) { return d.type; });
 
     this.nodes.append("text")
         .style("font-size", textHeight)
-        .style("font-family", "Impact")
         .attr("textLength", function (d) { return d.textLength; })
         .attr("dy", function (d, i) { return textHeight / 2; })
         .attr("x", nodeHeight / 4)
         .attr("y", nodeHeight / 2)
-        //.attr("fill", "black")
         .text(function (d) { return d.text; })
 
     this.title = this.svg.selectAll(".title")
                     .data(titleData)
                     .enter()
                     .append("text")
-                    .attr("class", ".title")
-                    .style("font-size", titleHeight)
-                    .style("font-family", "Impact")
+                    .classed("title", true)
                     .text(function (d) { return d.text })
                     .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });;
 
     this.resultText = this.svg.append("text")
-                                .attr("class", "result")
+                                .classed("result", true)
                                 .style("font-size", textHeight)
                                 .style("font-family", "Impact")
                                 .attr("x", resultTextX)

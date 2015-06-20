@@ -25,10 +25,13 @@ function poolClick(filters, graphPad) {
     will be called every frame
 */
 function tick(e, filters, data, renderer) {
-    renderer.nodes.each(tickNode(e.alpha * 0.3))
-                .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
+    var selectFilters = getSelectFilters(filters);
+    var filteredData = applyFilters(selectFilters, data);
 
-    var filteredData = applyFilters(filters, data);
+    renderer.nodes.each(tickNode(e.alpha * 0.3))
+                .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; })
+                .classed("disable", function (d) { return disableFilter(selectFilters, filteredData, d); });
+
     renderer.resultText.text("Result: "+filteredData.length);
 }
 
@@ -67,12 +70,15 @@ function getSelectFilters(filters) {
     return selectedNodes;
 }
 
-function applyFilters(filters,data) {
-    var selectFilters = getSelectFilters(filters);
+function applyFilters(filters, data) {
     var filteredData = [];
 
+    if (filters.length == 0) {
+        return data;
+    }
+
     for (var i = 0; i < data.length; i++) {
-        if (applyFiltersToSingleRecord(selectFilters, data[i])) {
+        if (applyFiltersToSingleRecord(filters, data[i])) {
             //pass all the filters
             filteredData.push(data[i]);
         }
@@ -87,10 +93,35 @@ function applyFiltersToSingleRecord(filters, record) {
             if (record.homeTeam != filters[i].text && record.awayTeam != filters[i].text) {
                 return false;
             }
+        } else if (filters[i].type == "graph") {
+
+        } else if (filters[i].type == "country") {
+
         } else {
             if (record[filters[i].type] != filters[i].text) {
                 return false;
             }
+        }
+    }
+    return true;
+}
+
+function disableFilter(filters,data, d) {
+    if (filters.length == 0) {
+        return false;
+    }
+
+    for (var i = 0; i < data.length; i++) {
+        if (d.type == "team") {
+            if (data[i].homeTeam == d.text || data[i].awayTeam == d.text) {
+                return false;
+            }
+        } else if (d.type == "country") {
+
+        } else if (d.type == "graph") {
+
+        } else {
+
         }
     }
     return true;
