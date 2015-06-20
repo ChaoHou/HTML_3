@@ -1,3 +1,6 @@
+/*
+    Renderer class for main screen
+*/
 function Renderer(data, titleData) {
     initializePos(data);
 
@@ -58,6 +61,12 @@ function Renderer(data, titleData) {
 
 }
 
+/*
+    Calculate fixed position for given data
+        1. Trying to place objects one ofter one,if exceed the width limit, start a new line
+        2. Place a gap between groups for displaying title
+        3. Return the height of the last item
+*/
 function calculateFixedPos(array) {
     array.sort(function (a, b) { return a.group * 100 + a.index - b.group * 100 - b.index });
 
@@ -81,9 +90,7 @@ function calculateFixedPos(array) {
                 x = offsetLeft;
                 y = y + nodeGap + nodeHeight;
             }
-
         }
-
     }
 
     return y;

@@ -1,3 +1,6 @@
+/*
+    load multiple files, call "start" when loading finished
+*/
 function load(start) {
     return queue()
     .defer(loadData, "data/2008-Table1.csv", 2008)
@@ -9,6 +12,9 @@ function load(start) {
     .awaitAll(start);
 }
 
+/*
+    construct data from the loaded files.
+*/
 function processData(results) {
 
     var teamMap = {
@@ -48,11 +54,16 @@ function processData(results) {
     initArray(venues, "venue", 4);
 
     var data = teams.concat(countries, years, graphs, venues);
+
+    //reset the height to hold the entire data
     height = calculateFixedPos(data) + groupGap + nodeHeight;
 
     return data;
 }
 
+/*
+    load a single csv file
+*/
 function loadData(file, year, callback) {
     d3.csv(file,
         function (d) {
@@ -76,6 +87,9 @@ function loadData(file, year, callback) {
         })
 }
 
+/*
+    contruct a sorted array which holds the distict proporty value from given data
+*/
 function constructFromProperty(data, p1, p2) {
     var n = {}, r = [];
     for(var i=0;i<data.length;i++){
@@ -94,6 +108,9 @@ function constructFromProperty(data, p1, p2) {
     return r.sort(function (a, b) { return a.text.toString().localeCompare(b.text); });
 }
 
+/*
+    initialize array
+*/
 function initArray(data, type, group) {
     for (var i = 0; i < data.length; i++) {
         data[i].type = type;
@@ -105,6 +122,9 @@ function initArray(data, type, group) {
     return data;
 }
 
+/*
+    generate title data for each group
+*/
 function generateTitles(data) {
     data.sort(function (a, b) { return a.group * 100 + a.index - b.group * 100 - b.index });
     var array = [];
@@ -126,10 +146,16 @@ function generateTitles(data) {
     return array;
 }
 
+/*
+    calculate text width for drawing
+*/
 function textLength(text) {
     return text.toString().length * charWidth;
 }
 
+/*
+    capitalize the first char of the given string
+*/
 function capitalize(text) {
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 }
