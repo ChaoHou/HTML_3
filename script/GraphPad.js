@@ -21,9 +21,5 @@ function GraphPad() {
 									.attr("cy", 50)
 									.attr("r", 20)
 									.attr("id", "closeButton")
-									.attr("fill", "red")
-									//.style("display","none")
-									.on("mousedown", function () {
-									    pad.style("display", "none");
-									});
+									.attr("fill", "red");
 }
