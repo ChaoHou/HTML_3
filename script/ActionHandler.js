@@ -22,6 +22,8 @@ function poolClick(filters, data, graphPad) {
     var filteredData = applyFilters(selectFilters, data);
 
     //you have filtered data, display them
+	
+	var graph = new Graph(filteredData, "line", graphPad.pad);
 
     graphPad.pad.style("display", "block");
 }
