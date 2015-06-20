@@ -1,14 +1,14 @@
-function render(data, titleData) {
+function Renderer(data, titleData) {
     initializePos(data);
 
-    var svg = d3.select("body")
+    this.svg = d3.select("body")
             .append("svg")
             .attr("id", "svg")
             .attr("height", height)
             .attr("width", width)
             .style("position", "absolute");
 
-    var pool = svg.append("rect")
+    this.pool = this.svg.append("rect")
                 .attr("x", 0)
                 .attr("y", 0)
                 .attr("fill", "purple")
@@ -16,25 +16,25 @@ function render(data, titleData) {
                 .attr("height", poolHeight)
                 .attr("id", "pool");
 
-    var force = d3.layout.force()
+    this.force = d3.layout.force()
                           .nodes(data)
                           .size([width, height])
                           .charge(0)
-                          .gravity(0);
-    force.start();
+                          .gravity(0)
+                          .start();
 
-    var nodes = svg.selectAll("g")
+    this.nodes = this.svg.selectAll("g")
                 .data(data)
                 .enter()
                 .append("g")
-                .call(force.drag);
+                .call(this.force.drag);
 
-    nodes.append("rect")
+    this.nodes.append("rect")
         .attr("width", function (d) { return d.width + nodeHeight / 2; })
         .attr("height", nodeHeight)
         .style("fill", function (d) { return d.color })
 
-    nodes.append("text")
+    this.nodes.append("text")
         .style("font-size", textHeight)
         .style("font-family", "Impact")
         .attr("textLength", function (d) { return d.width; })
@@ -44,7 +44,7 @@ function render(data, titleData) {
         .attr("fill", "black")
         .text(function (d) { return d.text; })
 
-    var title = svg.selectAll(".title")
+    this.title = this.svg.selectAll(".title")
                     .data(titleData)
                     .enter()
                     .append("text")
@@ -53,12 +53,6 @@ function render(data, titleData) {
                     .style("font-family", "Impact")
                     .text(function (d) { return d.text });
 
-    force.on("tick", function (e) {
-        //calculateFixedPos(data);
-        title.each(graviry(e.alpha * 0.3)).attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
-        nodes.each(graviry(e.alpha * 0.3))
-            .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
-    })
 
 }
 
@@ -100,9 +94,4 @@ function initializePos(data){
     }
 }
 
-function graviry(alpha) {
-    return function (d) {
-        d.y += (d.fixedY - d.y) * alpha;
-        d.x += (d.fixedX - d.x) * alpha;
-    }
-}
+
