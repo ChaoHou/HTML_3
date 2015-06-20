@@ -5,7 +5,7 @@ function appendHandlers(filters, data, renderer, graphPad) {
 
     renderer.force.on("tick", function (e) { tick(e, filters, data, renderer);})
 
-    renderer.pool.on("click", function () { poolClick(filters, graphPad); });
+    renderer.pool.on("click", function () { poolClick(filters, data, graphPad); });
 
     graphPad.closeButton.on("click", function () { graphPadCloseButtonClick(graphPad); })
 }
@@ -14,11 +14,14 @@ function graphPadCloseButtonClick(graphPad) {
     graphPad.pad.style("display", "none");
 }
 /*
-    
+    display filtered data
 */
-function poolClick(filters, graphPad) {
+function poolClick(filters, data, graphPad) {
     
     var selectFilters = getSelectFilters(filters);
+    var filteredData = applyFilters(selectFilters, data);
+
+    //you have filtered data, display them
 
     graphPad.pad.style("display", "block");
 }
