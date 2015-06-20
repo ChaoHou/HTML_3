@@ -95,6 +95,8 @@ function getSelectFilters(filters) {
             datetime,
             homeTeam:"homeTeam",
             awayTeam:"awayTeam",
+            homeTeamScore: 50,
+            awayTeamScore: 60,
             venue:"venue"
             }
 */
@@ -134,7 +136,8 @@ function applyFiltersToSingleRecord(filters, record) {
     return true;
 }
 
-function disableFilter(filters,data, d) {
+function disableFilter(filters, data, d) {
+    //d.disabled = false;
     if (filters.length == 0) {
         return false;
     }
@@ -147,10 +150,11 @@ function disableFilter(filters,data, d) {
         } else if (d.type == "country") {
 
         } else if (d.type == "graph") {
-
+            return false;
         } else {
 
         }
     }
+    //d.disabled = true;
     return true;
 }
