@@ -17,6 +17,18 @@ function Renderer(data, titleData) {
                 .attr("height", poolHeight)
                 .attr("id", "pool");
 
+    this.instructionClickText = this.svg.append("text")
+                                .classed("instructionClick", true)
+                                .attr("x", instructionClickTextX)
+                                .attr("y", poolHeight - nodeGap)
+                                .text("Click box to display data.");
+
+    this.instructionDragText = this.svg.append("text")
+                                .classed("instructionDrag", true)
+                                .attr("x", offsetLeft)
+                                .attr("y", poolHeight - nodeGap)
+                                .text("Drag and drop node here to filter data.");
+
     this.force = d3.layout.force()
                           .nodes(data)
                           .size([width, height])
@@ -53,11 +65,11 @@ function Renderer(data, titleData) {
 
     this.resultText = this.svg.append("text")
                                 .classed("result", true)
-                                .style("font-size", textHeight)
-                                .style("font-family", "Impact")
                                 .attr("x", resultTextX)
                                 .attr("y", poolHeight - nodeGap)
-                                .text("result:");
+                                .text("Result count:");
+
+
 }
 
 /*
@@ -233,6 +245,18 @@ function applyFiltersToSingleRecord(filters, record) {
             //if (awayTeamCountry == filters[i].text) {
                 //return false;
             //}
+        } else if (filters[i].type == "season") {
+            if (filters[i].text == "final") {
+                if (!isFinal(record)) {
+                    //the filter is final, but the record is regular
+                    return false;
+                }
+            } else {
+                if (isFinal(record)) {
+                    //the filter is regular, but the record is final
+                    return false;
+                }
+            }
         } else {
             //other filters, should match the value in the record
             if (record[filters[i].type] != filters[i].text) {
@@ -244,7 +268,9 @@ function applyFiltersToSingleRecord(filters, record) {
 }
 
 /*
-    disable filters based on the given data
+    update filters based on the given data
+        if there no data matchs this filter, disable it.
+        if user selected a country, will highlight the teams belong to the country
 */
 function updateFilter(map, filters, d, node) {
     node.attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
@@ -266,16 +292,11 @@ function updateFilter(map, filters, d, node) {
             disable = false;
         }
     } else if (d.type == "country") {
-        //
-        //if (country && country.text == d.text) {
-            //disable = false;
-        //}
         if (!country) {
+            //check if there are records for this country
             if (map[d.text]) {
                 disable = false;
             }
-
-            
         } else if (country.text == d.text) {
             disable = false;
         }
@@ -283,6 +304,7 @@ function updateFilter(map, filters, d, node) {
     } else if (d.type == "graph") {
         disable = false;
     } else {
+        //other filters
         if (map[d.text]) {
             disable = false;
         }

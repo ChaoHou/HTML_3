@@ -47,7 +47,8 @@ function tick(e, filters, data, renderer) {
 
     renderer.nodes.each(tickNode(e.alpha * 0.3, map, selectFilters));
 
-    renderer.resultText.text("Result: "+filteredData.length);
+    renderer.resultText.text("Result Count: " + filteredData.length);
+    renderer.instructionDragText.style("display", function () { return selectFilters.length > 0 ? "none" : "block"; });
 }
 
 

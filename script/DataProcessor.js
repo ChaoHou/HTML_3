@@ -20,13 +20,22 @@ function processData(results) {
     var teams = constructFromProperty(results,"homeTeam","awayTeam");
     initArray(teams, "team", 0);
 
-    var countries = [{ "text": "New Zealand" },
-                    { "text": "Australia" }];
-    initArray(countries, "country", 1);
+    var seasons =
+        [
+            { "text": "regular" },
+            { "text": "final" }
+        ];
+    initArray(seasons, "season", 1);
+
+    var countries =
+        [
+            { "text": "New Zealand" },
+            { "text": "Australia" }
+        ];
+    initArray(countries, "country", 2);
 
     var years = constructFromProperty(results, "year", null);
-
-    initArray(years, "year", 2);
+    initArray(years, "year", 3);
 
     var graphs =
         [
@@ -35,12 +44,14 @@ function processData(results) {
             { "text": "Pie chart" },
             { "text": "table" }
         ];
-    initArray(graphs, "graph", 3);
+    initArray(graphs, "graph", 4);
+
+    
 
     var venues = constructFromProperty(results, "venue", null);
-    initArray(venues, "venue", 4);
+    initArray(venues, "venue", 5);
 
-    var data = teams.concat(countries, years, graphs, venues);
+    var data = teams.concat(countries, seasons, years, graphs, venues);
 
     //reset the height to hold the entire data
     height = calculateFixedPos(data) + groupGap + nodeHeight;
@@ -202,6 +213,10 @@ function getTeamCountry(team) {
     return teamMap[team];
 }
 
+function isFinal(data) {
+    return (+data.round) >= 15;
+}
+
 function categorizeData(data) {
     var map = {};
     for (var i = 0; i < data.length; i++) {
@@ -211,6 +226,12 @@ function categorizeData(data) {
         map[data[i].venue] = true;
         var homeTeamCountry = getTeamCountry(data[i].homeTeam);
         map[homeTeamCountry] = true;
+        var roundIsFinal = isFinal(data[i]);
+        if (roundIsFinal) {
+            map["final"] = true;
+        } else {
+            map["regular"] = true;
+        }
     }
     return map;
 }
