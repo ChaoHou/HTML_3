@@ -42,7 +42,7 @@ function processData(results) {
             { "text": "Line chart" },
             { "text": "Bar chart" },
             { "text": "Pie chart" },
-            { "text": "table" }
+            { "text": "Table" }
         ];
     initArray(graphs, "graph", 4);
 
