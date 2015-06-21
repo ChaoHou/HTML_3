@@ -57,8 +57,7 @@ function loadData(file, year, callback) {
             var date = d.Date.split(/[\s,]+/);
             var format = d3.time.format("%Y %e %B");
             var datetime = format.parse(year + " " + date[1] + " " + date[2]);
-            var scores = d.Score.split("¨C")
-            console.log(scores)
+            var scores = getScores(d.Score.replace(/\s+/g, ''));
 
             if(datetime){
                 return {
@@ -67,6 +66,8 @@ function loadData(file, year, callback) {
                     date: datetime,
                     homeTeam: d["Home Team"],
                     awayTeam: d["Away Team"],
+                    homeTeamScore: scores[0],
+                    awayTeamScore: scores[1],
                     venue: d.Venue
                 }
             }
@@ -149,6 +150,28 @@ function mergeResults(results) {
     return data;
 }
 
+function getScores(score) {
+    if (!score || score.length == 0) {
+        console.log("empty string");
+    }
+    var scores = [];
+    for (var i = 0; i < score.length; i++) {
+        var tmpStr = "";
+        for (var j = i; j < score.length && isNumber(score.charAt(j)) ; j++,i++) {
+            tmpStr += score.charAt(j);
+        }
+        if (tmpStr.length > 0) {
+            scores.push(+tmpStr)
+        }
+        tmpStr = "";
+    }
+    return scores;
+}
+
+function isNumber(char) {
+    return /\d/.test(char);
+}
+
 /*
     calculate text width for drawing
 */
@@ -177,4 +200,17 @@ function getTeamCountry(team) {
         "West Coast Fever": "Australia",
     };
     return teamMap[team];
+}
+
+function categorizeData(data) {
+    var map = {};
+    for (var i = 0; i < data.length; i++) {
+        map[data[i].homeTeam] = true;
+        map[data[i].awayTeam] = true;
+        map[data[i].year] = true;
+        map[data[i].venue] = true;
+        var homeTeamCountry = getTeamCountry(data[i].homeTeam);
+        map[homeTeamCountry] = true;
+    }
+    return map;
 }

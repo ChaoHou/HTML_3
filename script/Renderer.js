@@ -128,7 +128,7 @@ function dragEnd(d, filters, data, renderer) {
 /*
     place filters in the pool one after one
 */
-function tickNode(alpha) {
+function tickNode(alpha, map, filters) {
     var x = offsetLeft, y = (poolHeight - nodeHeight) / 2;
     return function (d) {
         if (isInPool(d)) {
@@ -143,6 +143,9 @@ function tickNode(alpha) {
         d.y += (d.fixedY - d.y) * alpha;
         d.x += (d.fixedX - d.x) * alpha;
 
+        //var node = d3.select(this);
+        //node.attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; })
+        updateFilter(map, filters, d, d3.select(this));
     }
 }
 
@@ -202,8 +205,16 @@ function applyFilters(filters, data) {
     return filteredData;
 }
 
+/*
+    The record should match given filters.
+        1. team filter will pick up the record if the record's home team or away team matchs the filter
+        2. country filter will pick up the record that the home team country is equals to the given country
+        3. graph filter do nothing to the data, will be used to decide what graph to draw
+        4. other filters will pick up the record which have the same value
+*/
 function applyFiltersToSingleRecord(filters, record) {
     for (var i = 0; i < filters.length; i++) {
+        //team filter will select records that matches either home team or away team
         if (filters[i].type == "team") {
             if (record.homeTeam != filters[i].text && record.awayTeam != filters[i].text) {
                 return false;
@@ -223,6 +234,7 @@ function applyFiltersToSingleRecord(filters, record) {
                 //return false;
             //}
         } else {
+            //other filters, should match the value in the record
             if (record[filters[i].type] != filters[i].text) {
                 return false;
             }
@@ -231,38 +243,53 @@ function applyFiltersToSingleRecord(filters, record) {
     return true;
 }
 
-function disableFilter(filters, data, d) {
-    d.fixed = false;
-    if (filters.length == 0) {
-        return false;
-    }
+/*
+    disable filters based on the given data
+*/
+function updateFilter(map, filters, d, node) {
+    node.attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
+    var rect = node.select("rect");
+    var disable = true;
     var country = getCountryFilter(filters);
 
-    for (var i = 0; i < data.length; i++) {
-        if (d.type == "team") {
-            //if (country && getTeamCountry(d.text) == country.text) {
-                //return false;
-            //}
+    if (filters.length == 0) {
+        disable = false;
+    }
 
-            if (data[i].homeTeam == d.text || data[i].awayTeam == d.text) {
-                return false;
+    if (d.type == "team") {
+        if (country && getTeamCountry(d.text) != country.text) {
+            rect.classed("highlight", true);
+        } else {
+            rect.classed("highlight", false);
+        }
+        if (map[d.text]) {
+            disable = false;
+        }
+    } else if (d.type == "country") {
+        //
+        //if (country && country.text == d.text) {
+            //disable = false;
+        //}
+        if (!country) {
+            if (map[d.text]) {
+                disable = false;
             }
 
             
-        } else if (d.type == "country") {
-            if (country && country.text == d.text) {
-                return false;
-            }
-        } else if (d.type == "graph") {
-            return false;
-        } else {
-            if (data[i][d.type] == d.text) {
-                return false;
-            }
+        } else if (country.text == d.text) {
+            disable = false;
+        }
+        
+    } else if (d.type == "graph") {
+        disable = false;
+    } else {
+        if (map[d.text]) {
+            disable = false;
         }
     }
-    d.fixed = true;
-    return true;
+
+    node.classed("disable", disable);
+    d.fixed = disable;
 }
 
 function getCountryFilter(filters){
