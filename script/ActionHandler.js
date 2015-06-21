@@ -43,10 +43,9 @@ function openGraphPad(filters, data, graphPad) {
 function tick(e, filters, data, renderer) {
     var selectFilters = getSelectFilters(filters);
     var filteredData = applyFilters(selectFilters, data);
+    var map = categorizeData(filteredData);
 
-    renderer.nodes.each(tickNode(e.alpha * 0.3))
-                .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; })
-                .classed("disable", function (d) { return disableFilter(selectFilters, filteredData, d); });
+    renderer.nodes.each(tickNode(e.alpha * 0.3, map, selectFilters));
 
     renderer.resultText.text("Result: "+filteredData.length);
 }

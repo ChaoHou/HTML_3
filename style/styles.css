@@ -61,3 +61,8 @@ text {
 .disable {
     opacity: 0.2;
 }
+
+.highlight{
+    stroke-width:5px;
+    stroke: red;
+}
