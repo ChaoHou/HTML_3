@@ -17,19 +17,6 @@ function load(start) {
 */
 function processData(results) {
 
-    var teamMap = {
-        "Adelaide Thunderbirds": "Australia",
-        "Canterbury Tactix": "New Zealand",
-        "Central Pulse": "New Zealand",
-        "Melbourne Vixens": "Australia",
-        "New South Wales Swifts": "Australia",
-        "Northern Mystics": "New Zealand",
-        "Queensland Firebirds": "Australia",
-        "Southern Steel": "New Zealand",
-        "Waikato Bay of Plenty Magic": "New Zealand",
-        "West Coast Fever": "Australia",
-    };
-
     var teams = constructFromProperty(results,"homeTeam","awayTeam");
     initArray(teams, "team", 0);
 
@@ -70,6 +57,8 @@ function loadData(file, year, callback) {
             var date = d.Date.split(/[\s,]+/);
             var format = d3.time.format("%Y %e %B");
             var datetime = format.parse(year + " " + date[1] + " " + date[2]);
+            var scores = d.Score.split("¨C")
+            console.log(scores)
 
             if(datetime){
                 return {
@@ -174,3 +163,18 @@ function capitalize(text) {
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 }
 
+function getTeamCountry(team) {
+    var teamMap = {
+        "Adelaide Thunderbirds": "Australia",
+        "Canterbury Tactix": "New Zealand",
+        "Central Pulse": "New Zealand",
+        "Melbourne Vixens": "Australia",
+        "New South Wales Swifts": "Australia",
+        "Northern Mystics": "New Zealand",
+        "Queensland Firebirds": "Australia",
+        "Southern Steel": "New Zealand",
+        "Waikato Bay of Plenty Magic": "New Zealand",
+        "West Coast Fever": "Australia",
+    };
+    return teamMap[team];
+}
