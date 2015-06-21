@@ -12,6 +12,9 @@ function appendHandlers(filters, data, renderer, graphPad) {
     graphPad.closeButton.on("click", function () { closeGraphPad(graphPad); })
 }
 
+/*
+    handle the drag event
+*/
 function drag(filters, data, renderer) {
     return d3.behavior.drag()
                     .on("dragstart", function (d, i) { dragStart(renderer); })
@@ -19,6 +22,9 @@ function drag(filters, data, renderer) {
                     .on("dragend", function (d, i) { dragEnd(d, filters, data, renderer); });
 }
 
+/*
+    close graph pad
+*/
 function closeGraphPad(graphPad) {
     graphPad.pad.style("display", "none");
 }
@@ -50,6 +56,3 @@ function tick(e, filters, data, renderer) {
     renderer.resultText.text("Result Count: " + filteredData.length);
     renderer.instructionDragText.style("display", function () { return selectFilters.length > 0 ? "none" : "block"; });
 }
-
-
-

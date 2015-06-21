@@ -161,9 +161,13 @@ function mergeResults(results) {
     return data;
 }
 
+/*
+    get socores from score string
+*/
 function getScores(score) {
     if (!score || score.length == 0) {
-        console.log("empty string");
+        //console.log("empty string");
+        return;
     }
     var scores = [];
     for (var i = 0; i < score.length; i++) {
@@ -197,6 +201,9 @@ function capitalize(text) {
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 }
 
+/*
+    get the country of given team
+*/
 function getTeamCountry(team) {
     var teamMap = {
         "Adelaide Thunderbirds": "Australia",
@@ -217,6 +224,9 @@ function isFinal(data) {
     return (+data.round) >= 15;
 }
 
+/*
+    convert the data set to a map, will use the map to check whether the property exists
+*/
 function categorizeData(data) {
     var map = {};
     for (var i = 0; i < data.length; i++) {

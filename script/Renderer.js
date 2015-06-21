@@ -120,6 +120,10 @@ function dragStart(renderer) {
     renderer.force.stop();
 }
 
+/*
+    move the node while dragging,
+    if the node is disabled(fixed), don't move it.
+*/
 function dragMove(d, filters, data, renderer) {
     if (d.fixed) {
         return;
@@ -139,6 +143,7 @@ function dragEnd(d, filters, data, renderer) {
 
 /*
     place filters in the pool one after one
+    then update filters(disable, highlight)
 */
 function tickNode(alpha, map, filters) {
     var x = offsetLeft, y = (poolHeight - nodeHeight) / 2;
@@ -151,18 +156,18 @@ function tickNode(alpha, map, filters) {
             d.fixedX = d.originalX;
             d.fixedY = d.originalY;
         }
-
         d.y += (d.fixedY - d.y) * alpha;
         d.x += (d.fixedX - d.x) * alpha;
 
-        //var node = d3.select(this);
-        //node.attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; })
         updateFilter(map, filters, d, d3.select(this));
     }
 }
 
+/*
+    if half of the node is in the pool then return true;
+*/
 function isInPool(d) {
-    return d.y > 0 && d.y < poolHeight - nodeHeight;
+    return d.y < poolHeight - nodeHeight/2;
 }
 
 /*
@@ -191,7 +196,6 @@ function getSelectFilters(filters) {
             {
             year:2008,
             round:1,
-            datetime:
             datetime,
             homeTeam:"homeTeam",
             awayTeam:"awayTeam",
@@ -222,7 +226,8 @@ function applyFilters(filters, data) {
         1. team filter will pick up the record if the record's home team or away team matchs the filter
         2. country filter will pick up the record that the home team country is equals to the given country
         3. graph filter do nothing to the data, will be used to decide what graph to draw
-        4. other filters will pick up the record which have the same value
+        4. season filter will pick up record that matches given season(regular or final).
+        5. other filters will pick up the record which have the same value
 */
 function applyFiltersToSingleRecord(filters, record) {
     for (var i = 0; i < filters.length; i++) {
@@ -232,13 +237,13 @@ function applyFiltersToSingleRecord(filters, record) {
                 return false;
             }
         } else if (filters[i].type == "graph") {
-
+            // do nothing
         } else if (filters[i].type == "country") {
             // the country filter will accept the record that is:
             // 1. the home team country equals given country
             // (to be deside)2. the away team country not equals given country
             var homeTeamCountry = getTeamCountry(record.homeTeam);
-            var awayTeamCountry = getTeamCountry(record.awayTeam);
+            //var awayTeamCountry = getTeamCountry(record.awayTeam);
             if (homeTeamCountry != filters[i].text){ //&& awayTeamCountry != filters[i].text) {
                 return false;
             }
@@ -268,7 +273,7 @@ function applyFiltersToSingleRecord(filters, record) {
 }
 
 /*
-    update filters based on the given data
+    update filter nodes based on the given data
         if there no data matchs this filter, disable it.
         if user selected a country, will highlight the teams belong to the country
 */
@@ -283,7 +288,8 @@ function updateFilter(map, filters, d, node) {
     }
 
     if (d.type == "team") {
-        if (country && getTeamCountry(d.text) != country.text) {
+        //highlight the team belongs to given country
+        if (country && getTeamCountry(d.text) == country.text) {
             rect.classed("highlight", true);
         } else {
             rect.classed("highlight", false);
@@ -298,10 +304,12 @@ function updateFilter(map, filters, d, node) {
                 disable = false;
             }
         } else if (country.text == d.text) {
+            //only enable selected country, disable other countries
             disable = false;
         }
         
     } else if (d.type == "graph") {
+        //do not disable graph
         disable = false;
     } else {
         //other filters
