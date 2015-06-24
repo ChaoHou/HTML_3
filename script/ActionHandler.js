@@ -38,7 +38,7 @@ function openGraphPad(filters, data, graphPad) {
 
     //you have filtered data, display them
 	
-	var graph = new Graph(filteredData, "line", graphPad.pad);
+	var graph = new Graph(selectFilters, filteredData, "line", graphPad.pad);
 
     graphPad.pad.style("display", "block");
 }
