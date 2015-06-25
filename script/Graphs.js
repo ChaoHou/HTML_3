@@ -1,4 +1,4 @@
-var LINE_COLORS = ["red", "green", "blue", "blueViolet", "coral", "crimson", "brown", "aqua", "cornFlowerBlue", "chartreuse", "chocolate", "darkBlue", "greenYellow", "indigo"];
+var COLORS = ["red", "green", "blue", "blueViolet", "coral", "crimson", "brown", "aqua", "cornFlowerBlue", "chartreuse", "chocolate", "darkBlue", "greenYellow", "indigo"];
 
 function createGraph(filters, data, type, container){
 	if (filters.length == 1){
@@ -52,7 +52,7 @@ function LineGraph(data, minX, minY, maxX, maxY, container){
 		var path = container.append("path")
 					.attr("class","graphLine")
 					.attr("d",line(data[i].data))
-					.attr("stroke",LINE_COLORS[lineColorIdx%LINE_COLORS.length])
+					.attr("stroke",COLORS[lineColorIdx%COLORS.length])
 					.attr("stroke-width",2)
 					.attr("fill", "none")
 					.attr("transform","translate("+offsetLeft+","+offsetTop+")");
@@ -73,11 +73,53 @@ function LineGraph(data, minX, minY, maxX, maxY, container){
 												.attr("dy", ".35em")
 												.attr("text-anchor", "start")
 												.attr("font-size", "80%")
-												.style("fill", LINE_COLORS[lineColorIdx%LINE_COLORS.length])
+												.style("fill", COLORS[lineColorIdx%COLORS.length])
 												.text(data[i].text);
 		
 		lineColorIdx++;
 	}
+	
+}
+
+function PieChart(data, container){
+	var graphWidth = width - offsetTop - offsetRight;
+	var graphHeight = 480;
+	
+	var radius = Math.min(graphWidth, graphHeight)/2;
+	
+	var arc = d3.svg.arc()
+		.outerRadius(radius - 10)
+		.innerRadius(0);
+		
+	var pie = d3.layout.pie()
+		.sort(null)
+		.value(function(d) { return d.data; });
+					
+	this.elements = [];
+	
+	var g = container.append("g")
+		.attr("transform", "translate(" + graphWidth / 2 + "," + graphHeight / 2 + ")");
+		
+	this.elements[this.elements.length] = g;
+
+	var g2 = g.selectAll(".arc")
+		.data(pie(data))
+		.enter().append("g")
+		.attr("class", "arc");
+	
+	this.elements[this.elements.length] = g2;
+	
+	g2.append("path")
+		.attr("d", arc)
+		.style("fill", function(d, i) { return COLORS[i]; });
+
+	g2.append("text")
+		.attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+		.attr("dy", ".35em")
+		.style("text-anchor", "middle")
+		.style("fill", "white")
+		.style("font-size", "70%")
+		.text(function(d, i) { return data[i].text; });
 	
 }
 
@@ -203,4 +245,7 @@ function getCountryTeamsPerformance(country, data){
 	console.log(years);
 	
 	return {data:filteredData, minX:Math.min.apply(Math, years), minY:0, maxX:Math.max.apply(Math, years)+1, maxY:maxTotalScore};
+}
+
+
 }
