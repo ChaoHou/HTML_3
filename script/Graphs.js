@@ -12,6 +12,15 @@ function createGraph(filters, data, type, container){
 			return new LineGraph(filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
 		}
 	}
+	else if (filters.length == 2){
+		if (filters[0].type == "team" && filters[1].type == "team"){
+			var teams = [filters[0].text, filters[1].text];
+			console.log(getPerformanceOfTeams(teams, container));
+			
+		}
+	}
+	
+	new PieChart([{data:65, text:"player1"}, {data:38, text:"player2"}, {data:70, text:"player3"}], container);
 }
 
 function removeGraph(graph){
@@ -247,5 +256,24 @@ function getCountryTeamsPerformance(country, data){
 	return {data:filteredData, minX:Math.min.apply(Math, years), minY:0, maxX:Math.max.apply(Math, years)+1, maxY:maxTotalScore};
 }
 
-
+function getPerformanceOfTeams(teams, data){
+	var filteredData = [];
+	
+	// initialise the score
+	for (var i = 0; i < teams.length; i++){
+		filteredData[filteredData.length] = {text:teams[i], data:0};
+	}
+	
+	// get the total score of each team
+	for (var i = 0; i < data.length; i++){
+		for (var j = 0; j < teams.length; j++){
+			if (data[i].homeTeam == teams[j]){
+				filteredData[j].data += data[i].homeTeamScore; 
+			}
+			else if (data[i].awayTeam == teams[j]){
+				filteredData[j].data += data[i].awayTeamScore;
+			}
+		}
+	}
+	return filteredData;
 }
