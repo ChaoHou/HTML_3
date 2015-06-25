@@ -8,14 +8,15 @@ function createGraph(filters, data, type, container){
 		}
 		else if (filters[0].type == "country"){
 			filteredData = getCountryTeamsPerformance(filters[0].text, data);
-			console.log(filteredData);
 			return new LineGraph(filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
 		}
 	}
 	else if (filters.length == 2){
 		if (filters[0].type == "team" && filters[1].type == "team"){
 			var teams = [filters[0].text, filters[1].text];
-			console.log(getPerformanceOfTeams(teams, data));
+			filteredData = getPerformanceOfTeams(teams, data);
+			console.log(filteredData);
+			return new PieChart(filteredData, container);
 			
 		}
 	}
@@ -128,8 +129,7 @@ function PieChart(data, container){
 		.style("text-anchor", "middle")
 		.style("fill", "white")
 		.style("font-size", "70%")
-		.text(function(d, i) { return data[i].text; });
-	
+		.text(function(d, i) { return data[i].text+": "+data[i].data; });
 }
 
 /**
@@ -257,15 +257,12 @@ function getCountryTeamsPerformance(country, data){
 }
 
 function getPerformanceOfTeams(teams, data){
-	console.log(teams);
 	var filteredData = [];
 	
 	// initialise the score
 	for (var i = 0; i < teams.length; i++){
 		filteredData[filteredData.length] = {text:teams[i], data:0};
 	}
-	
-	console.log(data);
 	
 	// get the total score of each team
 	for (var i = 0; i < data.length; i++){
