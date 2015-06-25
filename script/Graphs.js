@@ -1,21 +1,26 @@
-function Graph(filters, data, type, container){
-	
+var LINE_COLORS = ["red", "green", "blue", "blueViolet", "coral", "crimson", "brown", "aqua", "cornFlowerBlue", "chartreuse", "chocolate", "darkBlue", "greenYellow", "indigo"];
+
+function createGraph(filters, data, type, container){
 	if (filters.length == 1){
 		if (filters[0].type == "team"){
 			var filteredData = getTeamScoreOverYearsData(filters[0].text, data);
-			console.log(data);
-			console.log(filteredData);
-			return lineGraph(filteredData.data, filteredData.maxX, filteredData.maxY, container);
+			return new LineGraph(filteredData.data, filteredData.maxX, filteredData.maxY, container);
 		}
 	}
 }
 
-function lineGraph(data, maxX, maxY, container){
-	var LINE_COLORS = ["red", "green", "blue", "blueViolet", "coral", "crimson", "brown", "aqua", "cornFlowerBlue", "chartreuse", "chocolate", "darkBlue", "greenYellow", "indigo"];
-	var lineColorIdx = 0;
-	
+function removeGraph(graph){
+	console.log(graph);
+	for(var i = 0; i < graph.elements.length; i++){
+		graph.elements[i].remove();
+	}
+}
+
+function LineGraph(data, maxX, maxY, container){
 	var graphWidth = width - offsetTop - offsetRight;
 	var graphHeight = 480;
+	
+	var lineColorIdx = 0;
 	
 	var x = d3.scale.linear().domain([0,maxX]).range([0, graphWidth]);
 	var y = d3.scale.linear().domain([0,maxY]).range([graphHeight, 0]);
@@ -25,27 +30,50 @@ function lineGraph(data, maxX, maxY, container){
 	
 	var line = d3.svg.line()
 					.x(function(d) { return x(d.round); })
-					.y(function(d) { return y(d.score); });
+					.y(function(d) { return y(d.score); })
+					
+	this.elements = [];
 	
-	container.append("g")
-				.attr("class","axis")
-				.attr("transform","translate("+offsetLeft+","+(graphHeight+offsetTop)+")")
-				.call(xAxis);
-	container.append("g")
-				.attr("class","axis")
-				.attr("transform","translate("+offsetLeft+","+offsetTop+")")
-				.call(yAxis);
+	this.elements[this.elements.length] = container.append("g")
+											.attr("class","axis")
+											.attr("transform","translate("+offsetLeft+","+(graphHeight+offsetTop)+")")
+											.call(xAxis);
+	this.elements[this.elements.length] = container.append("g")
+											.attr("class","axis")
+											.attr("transform","translate("+offsetLeft+","+offsetTop+")")
+											.call(yAxis);
 	
 	for (var i = 0; i < data.length; i++){
-		container.append("path")
+		var path = container.append("path")
 					.attr("class","graphLine")
 					.attr("d",line(data[i].data))
 					.attr("stroke",LINE_COLORS[lineColorIdx%LINE_COLORS.length])
 					.attr("stroke-width",2)
 					.attr("fill", "none")
 					.attr("transform","translate("+offsetLeft+","+offsetTop+")");
+		
+		var totalLength = path.node().getTotalLength();
+
+		path.attr("stroke-dasharray", totalLength + " " + totalLength)
+			.attr("stroke-dashoffset", totalLength)
+			.transition()
+			.duration(5000)
+			.ease("linear")
+			.attr("stroke-dashoffset", 0);
+						
+		this.elements[this.elements.length] = path;
+				
+		this.elements[this.elements.length] = container.append("text")
+												.attr("transform", "translate(" + (x(data[i].data[0].round)+offsetLeft - 30) + "," + (y(data[i].data[0].score)+offsetTop) + ")")
+												.attr("dy", ".35em")
+												.attr("text-anchor", "start")
+												.style("font-size", "70%")
+												.style("fill", LINE_COLORS[lineColorIdx%LINE_COLORS.length])
+												.text(data[i].text);
+		
 		lineColorIdx++;
 	}
+	
 }
 
 /**
@@ -99,6 +127,8 @@ function getTeamScoreOverYearsData(text, data){
 			currentRound++;
 		}
 	}
+	
+	console.log(filteredData);
 	
 	return {data:filteredData, maxX:maxRound, maxY:maxScore};
 }

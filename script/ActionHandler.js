@@ -27,6 +27,8 @@ function drag(filters, data, renderer) {
 */
 function closeGraphPad(graphPad) {
     graphPad.pad.style("display", "none");
+	
+	removeGraph(graph);
 }
 /*
     display filtered data
@@ -38,7 +40,9 @@ function openGraphPad(filters, data, graphPad) {
 
     //you have filtered data, display them
 	
-	var graph = new Graph(selectFilters, filteredData, "line", graphPad.pad);
+	graph = createGraph(selectFilters, filteredData, "line", graphPad.pad);
+	
+	console.log(graph);
 
     graphPad.pad.style("display", "block");
 }
