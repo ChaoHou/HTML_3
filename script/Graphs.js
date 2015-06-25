@@ -15,13 +15,16 @@ function createGraph(filters, data, type, container){
 		if (filters[0].type == "team" && filters[1].type == "team"){
 			var teams = [filters[0].text, filters[1].text];
 			filteredData = getPerformanceOfTeams(teams, data);
-			console.log(filteredData);
 			return new PieChart(filteredData, container);
 			
 		}
+		else if (filters[0].type == "team" && filters[1].type == "venue"){
+			filteredData = getWinningRateVenue(filters[0].text, filters[1].text, data);
+			console.log(data);
+			console.log(filteredData);
+			return new PieChart(filteredData, container);
+		}
 	}
-	
-	new PieChart([{data:65, text:"player1"}, {data:38, text:"player2"}, {data:70, text:"player3"}], container);
 }
 
 function removeGraph(graph){
@@ -256,6 +259,9 @@ function getCountryTeamsPerformance(country, data){
 	return {data:filteredData, minX:Math.min.apply(Math, years), minY:0, maxX:Math.max.apply(Math, years)+1, maxY:maxTotalScore};
 }
 
+/**
+ * format: [{text:team, data:score}]
+ */
 function getPerformanceOfTeams(teams, data){
 	var filteredData = [];
 	
@@ -275,5 +281,38 @@ function getPerformanceOfTeams(teams, data){
 			}
 		}
 	}
+	return filteredData;
+}
+
+function getWinningRateVenue(team, venue, data){
+	var filteredData = [];
+	var winCount = 0;
+	var loseCount = 0;
+	
+	for (var i = 0; i < data.length; i++){
+		if (data[i].homeTeam == team && data[i].venue == venue){
+			if (data[i].homeTeamScore > data[i].awayTeamScore){
+				winCount++;
+			}
+			else {
+				loseCount++;
+			}
+		}
+		else if (data[i].awayTeam == team && data[i].venue == venue){
+			if (data[i].awayTeamScore > data[i].homeTeamScore){
+				winCount++;
+			}
+			else {
+				loseCount++;
+			}
+		}
+	}
+	if (winCount > 0){
+		filteredData[filteredData.length] = {text:"Win", data:winCount};
+	}
+	if (loseCount > 0){
+		filteredData[filteredData.length] = {text:"Lose", data:loseCount};
+	}
+	
 	return filteredData;
 }
