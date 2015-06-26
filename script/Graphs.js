@@ -4,25 +4,23 @@ function createGraph(filters, data, type, container){
 	if (filters.length == 1){
 		if (filters[0].type == "team"){
 			var filteredData = getTeamScoreOverYearsData(filters[0].text, data);
-			return new LineGraph(filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
+			return new LineGraph(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
 		}
-		else if (filters[0].type == "country"){
+		if (filters[0].type == "country"){
 			filteredData = getCountryTeamsPerformance(filters[0].text, data);
-			return new LineGraph(filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
+			return new LineGraph(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
 		}
 	}
-	else if (filters.length == 2){
+	if (filters.length == 2){
 		if (filters[0].type == "team" && filters[1].type == "team"){
 			var teams = [filters[0].text, filters[1].text];
 			filteredData = getPerformanceOfTeams(teams, data);
-			return new PieChart(filteredData, container);
+			return new PieChart(filteredData.title, filteredData.data, container);
 			
 		}
-		else if (filters[0].type == "team" && filters[1].type == "venue"){
+		if (filters[0].type == "team" && filters[1].type == "venue"){
 			filteredData = getWinningRateVenue(filters[0].text, filters[1].text, data);
-			console.log(data);
-			console.log(filteredData);
-			return new PieChart(filteredData, container);
+			return new PieChart(filteredData.title, filteredData.data, container);
 		}
 	}
 }
@@ -34,9 +32,10 @@ function removeGraph(graph){
 	}
 }
 
-function LineGraph(data, minX, minY, maxX, maxY, container){
-	var graphWidth = width - offsetTop - offsetRight;
+function LineGraph(title, data, minX, minY, maxX, maxY, container){
+	var graphWidth = width - offsetLeft-offsetRight;
 	var graphHeight = 480;
+	var marginTop = 40;
 	
 	var lineColorIdx = 0;
 	
@@ -54,11 +53,11 @@ function LineGraph(data, minX, minY, maxX, maxY, container){
 	
 	this.elements[this.elements.length] = container.append("g")
 											.attr("class","axis")
-											.attr("transform","translate("+offsetLeft+","+(graphHeight+offsetTop)+")")
+											.attr("transform","translate("+offsetLeft+","+(graphHeight+offsetTop+marginTop)+")")
 											.call(xAxis);
 	this.elements[this.elements.length] = container.append("g")
 											.attr("class","axis")
-											.attr("transform","translate("+offsetLeft+","+offsetTop+")")
+											.attr("transform","translate("+offsetLeft+","+(offsetTop+marginTop)+")")
 											.call(yAxis);
 	
 	for (var i = 0; i < data.length; i++){
@@ -68,7 +67,7 @@ function LineGraph(data, minX, minY, maxX, maxY, container){
 					.attr("stroke",COLORS[lineColorIdx%COLORS.length])
 					.attr("stroke-width",2)
 					.attr("fill", "none")
-					.attr("transform","translate("+offsetLeft+","+offsetTop+")");
+					.attr("transform","translate("+offsetLeft+","+(offsetTop+marginTop)+")");
 		
 		var totalLength = path.node().getTotalLength();
 
@@ -82,7 +81,7 @@ function LineGraph(data, minX, minY, maxX, maxY, container){
 		this.elements[this.elements.length] = path;
 				
 		this.elements[this.elements.length] = container.append("text")
-												.attr("transform", "translate(" + (graphWidth-50) + "," + (offsetTop+100+30*i) + ")")
+												.attr("transform", "translate(" + (graphWidth-60) + "," + (offsetTop+marginTop+100+30*i) + ")")
 												.attr("dy", ".35em")
 												.attr("text-anchor", "start")
 												.attr("font-size", "80%")
@@ -92,11 +91,19 @@ function LineGraph(data, minX, minY, maxX, maxY, container){
 		lineColorIdx++;
 	}
 	
+	this.elements[this.elements.length] = container.append("text")
+											.attr("text-anchor", "middle")
+											.attr("transform", "translate(" + (graphWidth/2) + "," + offsetTop + ")")
+											.style("font-size", "150%")
+											.text(title);
+	
 }
 
-function PieChart(data, container){
-	var graphWidth = width - offsetTop - offsetRight;
+function PieChart(title, data, container){
+	var graphWidth = width - offsetLeft - offsetRight;
 	var graphHeight = 480;
+	
+	var marginTop = 100;
 	
 	var radius = Math.min(graphWidth, graphHeight)/2;
 	
@@ -111,7 +118,7 @@ function PieChart(data, container){
 	this.elements = [];
 	
 	var g = container.append("g")
-		.attr("transform", "translate(" + graphWidth / 2 + "," + graphHeight / 2 + ")");
+		.attr("transform", "translate(" + graphWidth / 2 + "," + (graphHeight / 2 + marginTop)+ ")");
 		
 	this.elements[this.elements.length] = g;
 
@@ -133,6 +140,12 @@ function PieChart(data, container){
 		.style("fill", "white")
 		.style("font-size", "70%")
 		.text(function(d, i) { return data[i].text+": "+data[i].data; });
+		
+	this.elements[this.elements.length] = container.append("text")
+											.attr("text-anchor", "middle")
+											.attr("transform", "translate(" + (graphWidth/2) + "," + offsetTop + ")")
+											.style("font-size", "150%")
+											.text(title);
 }
 
 /**
@@ -187,7 +200,7 @@ function getTeamScoreOverYearsData(teamName, data){
 		}
 	}
 	
-	return {data:filteredData, minX:0, minY:0, maxX:maxRound+2, maxY:maxScore};
+	return {title:teamName.toUpperCase()+" - THE PERFORMANCE/TOTAL SCORE STATISTICS", data:filteredData, minX:0, minY:0, maxX:maxRound+2, maxY:maxScore};
 }
 
 /**
@@ -256,7 +269,7 @@ function getCountryTeamsPerformance(country, data){
 	
 	console.log(years);
 	
-	return {data:filteredData, minX:Math.min.apply(Math, years), minY:0, maxX:Math.max.apply(Math, years)+1, maxY:maxTotalScore};
+	return {title:"THE PERFORMANCE/TOTAL SCORE OF EACH TEAM FROM "+country.toUpperCase(), data:filteredData, minX:Math.min.apply(Math, years), minY:0, maxX:Math.max.apply(Math, years)+1, maxY:maxTotalScore};
 }
 
 /**
@@ -281,7 +294,7 @@ function getPerformanceOfTeams(teams, data){
 			}
 		}
 	}
-	return filteredData;
+	return {title:"THE PERFORMANCE/TOTAL SCORE IN ALL SEASONS - "+teams[0].toUpperCase()+" VS "+teams[1].toUpperCase(), data:filteredData};
 }
 
 function getWinningRateVenue(team, venue, data){
@@ -314,5 +327,5 @@ function getWinningRateVenue(team, venue, data){
 		filteredData[filteredData.length] = {text:"Lose", data:loseCount};
 	}
 	
-	return filteredData;
+	return {title: "WIN/LOSE RATE OF "+team.toUpperCase()+" IN "+venue.toUpperCase(), data:filteredData};
 }
