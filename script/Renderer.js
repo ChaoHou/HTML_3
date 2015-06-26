@@ -281,7 +281,8 @@ function updateFilter(map, filters, d, node) {
     node.attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
     var rect = node.select("rect");
     var disable = true;
-    var country = getCountryFilter(filters);
+    var country = getFilterByType(filters, "country");
+    var graph = getFilterByType(filters, "graph");
 
     if (filters.length == 0) {
         disable = false;
@@ -310,7 +311,15 @@ function updateFilter(map, filters, d, node) {
         
     } else if (d.type == "graph") {
         //do not disable graph
-        disable = false;
+        if (graph) {
+            if (graph.text == d.text) {
+                disable = false;
+            } else {
+                disable = true;
+            }
+        } else {
+            disable = false;
+        }
     } else {
         //other filters
         if (map[d.text]) {
@@ -322,9 +331,9 @@ function updateFilter(map, filters, d, node) {
     d.fixed = disable;
 }
 
-function getCountryFilter(filters){
-    for (var i = 0; i < filters.length; i++){
-        if(filters[i].type == "country"){
+function getFilterByType(filters, type) {
+    for (var i = 0; i < filters.length; i++) {
+        if (filters[i].type == type) {
             return filters[i];
         }
     }
