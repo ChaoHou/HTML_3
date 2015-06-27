@@ -245,3 +245,19 @@ function categorizeData(data) {
     }
     return map;
 }
+
+function createFilterMap(filters) {
+    var map = {};
+    for (var i = 0; i < filters.length; i++) {
+        if (filters[i].type == "team") {
+            if (!map.team1) {
+                map.team1 = filters[i].text;
+            } else {
+                map.team2 = filters[i].text;
+            }
+        } else {
+            map[filters[i].type] = filters[i].text;
+        }
+    }
+    return map;
+}

@@ -173,7 +173,7 @@ function isInPool(d) {
 /*
     return value format:
         array of object:
-            { 
+            {
             type: "type",
             text:"text"
             }
@@ -308,7 +308,7 @@ function updateFilter(map, filters, d, node) {
             //only enable selected country, disable other countries
             disable = false;
         }
-        
+
     } else if (d.type == "graph") {
         //do not disable graph
         if (graph) {

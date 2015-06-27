@@ -1,6 +1,20 @@
 var COLORS = ["green", "red", "blue", "blueViolet", "coral", "crimson", "brown", "aqua", "cornFlowerBlue", "chartreuse", "chocolate", "darkBlue", "greenYellow", "indigo"];
 
-function createGraph(filters, data, type, container){
+function createGraph(map, data, type, container) {
+    //if no graph get selected or selected table, display table
+    if (!map.graph || map.graph == "Table") {
+        return new Table(data);
+    }
+    //if 2 teams are selected
+    if (map.team1 && map.team2) {
+
+    }
+    //if venue is selected
+    if (map.venue) {
+        var drawingData = getWinningPercentageByVenue(map.team1, map.venue, data);
+        return new PieChart(drawingData.title, drawingData.data, container);
+    }
+
 	if (filters.length == 1){
 		if (filters[0].type == "team"){
 			var filteredData = getTeamScoreOverYears(filters[0].text, null, null, data);
@@ -46,6 +60,36 @@ function removeGraph(graph){
 	for(var i = 0; i < graph.elements.length; i++){
 		graph.elements[i].remove();
 	}
+}
+
+function Table(data) {
+    var titles = ["Year", "Round", "Home Team", "Score", "Away Team", "Venue"];
+
+    var table = d3.select("body").append("table").classed("table", true);
+
+    this.elements = [];
+    this.elements[0] = table;
+
+    table.append("thead")
+        .append("tr")
+        .selectAll("th")
+        .data(titles)
+        .enter()
+        .append("th")
+        .text(function (d) { return d; })
+
+    table.append("tbody")
+        .selectAll("tr")
+        .data(data)
+        .enter()
+        .append("tr")
+        .attr("class",function(d,i){if(i%2 == 1){return "alt"}})
+        .selectAll("td")
+        .data(function (d, i) {
+            return [d.year,d.round,d.homeTeam,d.homeTeamScore+"-"+d.awayTeamScore,d.awayTeam,d.venue];
+        }).enter()
+        .append("td")
+        .html(function (d, i) { return d; });
 }
 
 function LineGraph(title, data, minX, minY, maxX, maxY, container){
@@ -408,35 +452,30 @@ function getPerformanceOfTeams(teams, data){
 	return {title:"THE PERFORMANCE/TOTAL SCORE IN ALL SEASONS - "+teams[0].toUpperCase()+" VS "+teams[1].toUpperCase(), data:filteredData};
 }
 
-function getWinningRateVenue(team, venue, data){
-	var filteredData = [];
-	var winCount = 0;
-	var loseCount = 0;
+function getWinningPercentageByVenue(team, venue, data) {
+	var returnData = [];
+	var winCount = {};
 	
 	for (var i = 0; i < data.length; i++){
-		if (data[i].homeTeam == team && data[i].venue == venue){
-			if (data[i].homeTeamScore > data[i].awayTeamScore){
-				winCount++;
-			}
-			else {
-				loseCount++;
-			}
-		}
-		else if (data[i].awayTeam == team && data[i].venue == venue){
-			if (data[i].awayTeamScore > data[i].homeTeamScore){
-				winCount++;
-			}
-			else {
-				loseCount++;
-			}
-		}
+	    if (data[i].homeTeamScore > data[i].awayTeamScore) {
+	        winCount[data[i].homeTeam] = winCount[data[i].homeTeam] ? winCount[data[i].homeTeam] + 1 : 1;
+	    } else if (data[i].awayTeamScore > data[i].homeTeamScore) {
+	        winCount[data[i].awayTeam] = winCount[data[i].awayTeam] ? winCount[data[i].awayTeam] + 1 : 1;
+	    } else {
+            //draw, do nothing
+	    }
 	}
-	if (winCount > 0){
-		filteredData[filteredData.length] = {text:"Win", data:winCount};
+
+	if (team) {
+	    var win = winCount[team] ? winCount[team] : 0;
+	    returnData[returnData.length] = { text: "Win", data: win };
+	    returnData[returnData.length] = { text: "Lose", data: (data.length - win) };
+	    return { title: "WIN/LOSE PERCENTAGE OF " + team.toUpperCase() + " IN " + venue.toUpperCase(), data: returnData };
+	}else{
+	    var keys = Object.keys(winCount);
+	    for (var i = 0; i < keys.length; i++) {
+	        returnData[returnData.length] = { text: keys[i], data: winCount[keys[i]] };
+	    }
+	    return { title: "WINNING PERCENTAGE OF TEAMS IN " + venue.toUpperCase(), data: returnData };
 	}
-	if (loseCount > 0){
-		filteredData[filteredData.length] = {text:"Lose", data:loseCount};
-	}
-	
-	return {title: "WIN/LOSE RATE OF "+team.toUpperCase()+" IN "+venue.toUpperCase(), data:filteredData};
 }

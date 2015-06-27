@@ -90,3 +90,33 @@ text {
     stroke-width:5px;
     stroke: red;
 }
+
+.table{
+    position:absolute;
+    left:50px;
+    top:40px;
+    display:block;
+
+    z-index:1;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th {
+    text-align: left;
+    padding-top: 5px;
+    padding-bottom: 4px;
+    border: 1px solid #98bf21;
+    background-color: #A7C942;
+    color: white;
+    font-weight: bold;
+}
+
+td {
+    border: 1px solid #98bf21;
+    padding: 4px 7px 2px 7px;
+}
+
+tr.alt td {
+    background-color: #EAF2D3;
+}
