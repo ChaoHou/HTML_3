@@ -7,53 +7,41 @@ function createGraph(map, data, type, container) {
     }
     //if 2 teams are selected
     if (map.team1 && map.team2) {
-
+        var teams = [map.team1, map.team2];
+        filteredData = getPerformanceOfTeams(teams, data);
+        return new PieChart(filteredData.title, filteredData.data, container);
     }
     //if venue is selected
     if (map.venue) {
         var drawingData = getWinningPercentageByVenue(map.team1, map.venue, data);
         return new PieChart(drawingData.title, drawingData.data, container);
     }
+    //if country is selected
+    if (map.country) {
+        //if a year is passed in along with country, draw pie graph
+        if (map.year || (map.season && map.season == "final")) {
+            //if the season is final ,draw pie chart, if it is regular, draw line chart
+            var drawingData = getWinningPercentageByVenue(map.team1, map.venue, data);
+            return new PieChart(drawingData.title, drawingData.data, container);
+        }
+        filteredData = getCountryTeamsPerformance(map.country, null, null, data);
+        return new LineGraph(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
+    }
+    //if one team is selected
+    if (map.team1) {
+        //a year may be passed in, 
+        //a season may be passed in
+        var filteredData = getTeamScoreOverYears(map.team1, null, null, data);
+        return new LineGraph(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
+    }
+    //if a year is selected
+    if (map.year) {
+        var drawingData = getTeamScoreForYear(data);
+        return new BarChart(drawingData.title, drawingData.data, container);
+    }
 
-	if (filters.length == 1){
-		if (filters[0].type == "team"){
-			var filteredData = getTeamScoreOverYears(filters[0].text, null, null, data);
-			return new LineGraph(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
-		}
-		if (filters[0].type == "country"){
-			filteredData = getCountryTeamsPerformance(filters[0].text, null, null, data);
-			return new LineGraph(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
-		}
-	}
-	if (filters.length == 2){
-		if (filters[0].type == "team" && filters[1].type == "team"){
-			var teams = [filters[0].text, filters[1].text];
-			filteredData = getPerformanceOfTeams(teams, data);
-			return new PieChart(filteredData.title, filteredData.data, container);
-		}
-		if (filters[0].type == "team" && filters[1].type == "venue"){
-			filteredData = getWinningRateVenue(filters[0].text, filters[1].text, data);
-			return new PieChart(filteredData.title, filteredData.data, container);
-		}
-		if (filters[0].type == "team" && filters[1].type == "year"){
-			var filteredData = getTeamScoreOverYears(filters[0].text, null, filters[1].text, data);
-			return new BarChart(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
-		}
-		if (filters[0].type == "team" && filters[1].type == "season"){
-			var filteredData = getTeamScoreOverYears(filters[0].text, filters[1].text, null, data);
-			return new LineGraph(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
-		}
-	}
-	if (filters.length == 3){
-		if (filters[0].type == "team" && filters[1].type == "season" && filters[2].type == "year"){
-			filteredData = getTeamScoreOverYears(filters[0].text, filters[1].text, filters[2].text, data);
-			return new LineGraph(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
-		}
-		if (filters[0].type == "season" && filters[1].type == "country" && filters[2].type == "year"){
-			filteredData = getCountryTeamsPerformance(filters[1].text, filters[0].text, filters[2].text, data);
-			return new LineGraph(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);			
-		}
-	}
+    //if didn't meet any of the conditions, display table
+    return new Table(data);
 }
 
 function removeGraph(graph){
@@ -172,25 +160,21 @@ function LineGraph(title, data, minX, minY, maxX, maxY, container){
 	
 }
 
-function BarChart(title, data, minX, minY, maxX, maxY, container){
+function BarChart(title, data, container){
 	var graphWidth = width - offsetLeft-offsetRight;
 	var graphHeight = 480;
 	var marginTop = 40;
 	
-	var x = d3.scale.linear().domain([minX,maxX]).range([0, graphWidth]);
-	var y = d3.scale.linear().domain([minY,maxY]).range([graphHeight, 0]);
+	var x = d3.scale.ordinal().domain(data.map(function (d) { return d.team })).rangeRoundBands([0, graphWidth],0.1);
+	var y = d3.scale.linear().domain([0,d3.max(data,function(d){return d.score;})]).range([graphHeight, 0]);
 	
 	var xAxis = d3.svg.axis().scale(x).orient("bottom");
 	var yAxis = d3.svg.axis().scale(y).orient("left");
 	
-	var line = d3.svg.line()
-					.x(function(d) { return x(d.x); })
-					.y(function(d) { return y(d.y); })
-					
 	this.elements = [];
 	
 	this.elements[this.elements.length] = container.append("g")
-											.attr("class","axis")
+											.attr("class", "axis barX")
 											.attr("transform","translate("+offsetLeft+","+(graphHeight+offsetTop+marginTop)+")")
 											.call(xAxis);
 	this.elements[this.elements.length] = container.append("g")
@@ -199,13 +183,13 @@ function BarChart(title, data, minX, minY, maxX, maxY, container){
 											.call(yAxis);
 											
 	this.elements[this.elements.length] = container.selectAll(".bar")
-		.data(data[0].data)
+		.data(data)
 		.enter().append("rect")
 					.attr("class", "bar")
-					.attr("x", function(d) { return x(d.x); })
-					.attr("width", 20)
-					.attr("y", function(d) { return y(d.y); })
-					.attr("height", function(d) { return graphHeight - y(d.y); })
+					.attr("x", function(d) { return x(d.team); })
+					.attr("width", x.rangeBand())
+					.attr("y", function(d) { return y(d.score); })
+					.attr("height", function (d) { return graphHeight - y(d.score); })
 					.attr("fill", COLORS[0])
 					.attr("transform","translate("+offsetLeft+","+(offsetTop+marginTop)+")")
 			
@@ -356,6 +340,28 @@ function getTeamScoreOverYears(teamName, season, year, data){
 	return {title:teamName.toUpperCase()+" - THE PERFORMANCE/TOTAL SCORE STATISTICS", data:filteredData, minX:minRound, minY:minScore, maxX:maxRound+2, maxY:maxScore};
 }
 
+
+/**
+ * Prerequest: the data passed in should be single year
+ * format: {title,data:[{team, score}]}
+ */
+function getTeamScoreForYear(data) {
+    var scores = {};
+    var returnData = [];
+
+    for (var i = 0; i < data.length; i++) {
+        scores[data[i].homeTeam] = scores[data[i].homeTeam] ? scores[data[i].homeTeam] + data[i].homeTeamScore : data[i].homeTeamScore;
+        scores[data[i].awayTeam] = scores[data[i].awayTeam] ? scores[data[i].awayTeam] + data[i].awayTeamScore : data[i].awayTeamScore;
+    }
+
+    var keys = Object.keys(scores);
+    for(var i=0;i<keys.length;i++){
+        returnData[returnData.length] = {team:keys[i],score:scores[keys[i]]};
+    }
+
+    return { title: "THE SCORES OF TEAMS IN YEAR: " + data[0].year, data: returnData };
+}
+
 /**
  * format: [teamName, [{year, score}]], x-axis is the year, y-axis is the score
  */
@@ -470,12 +476,21 @@ function getWinningPercentageByVenue(team, venue, data) {
 	    var win = winCount[team] ? winCount[team] : 0;
 	    returnData[returnData.length] = { text: "Win", data: win };
 	    returnData[returnData.length] = { text: "Lose", data: (data.length - win) };
-	    return { title: "WIN/LOSE PERCENTAGE OF " + team.toUpperCase() + " IN " + venue.toUpperCase(), data: returnData };
+	    if (venue) {
+	        return { title: "WIN/LOSE PERCENTAGE OF " + team.toUpperCase() + " IN " + venue.toUpperCase(), data: returnData };
+	    } else {
+	        return { title: "WIN/LOSE PERCENTAGE OF " + team.toUpperCase(), data: returnData };
+	    }
+	    
 	}else{
 	    var keys = Object.keys(winCount);
 	    for (var i = 0; i < keys.length; i++) {
 	        returnData[returnData.length] = { text: keys[i], data: winCount[keys[i]] };
 	    }
-	    return { title: "WINNING PERCENTAGE OF TEAMS IN " + venue.toUpperCase(), data: returnData };
+	    if (venue) {
+	        return { title: "WINNING PERCENTAGE OF TEAMS IN " + venue.toUpperCase(), data: returnData };
+	    } else {
+	        return { title: "WINNING PERCENTAGE OF TEAMS", data: returnData };
+	    }
 	}
 }

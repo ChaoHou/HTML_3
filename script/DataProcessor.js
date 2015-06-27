@@ -39,9 +39,7 @@ function processData(results) {
 
     var graphs =
         [
-            { "text": "Line chart" },
-            { "text": "Bar chart" },
-            { "text": "Pie chart" },
+            { "text": "Chart" },
             { "text": "Table" }
         ];
     initArray(graphs, "graph", 4);

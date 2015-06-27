@@ -19,6 +19,11 @@ function GraphPad() {
 									.attr("cx", width - 50)
 									.attr("cy", 50)
 									.attr("r", 20)
-									.attr("id", "closeButton")
-									.attr("fill", "red");
+									.attr("class", "closeButton")
+
+    pad.append("text")
+        .attr("x", width - 59)
+        .attr("y", 59)
+        .attr("class", "closeButtonText")
+        .text("X");
 }

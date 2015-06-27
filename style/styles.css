@@ -19,10 +19,10 @@ text {
     stroke-width: 1.5px;
 }
 
-.axis {
-    fill: none;
-    stroke: #000;
-    shape-rendering: crispEdges;
+.axis path,.axis path {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
 }
 
 #pool {
@@ -119,4 +119,25 @@ td {
 
 tr.alt td {
     background-color: #EAF2D3;
+}
+
+.barX {
+    font-family: Impact;
+    font-size:10px;
+}
+
+.closeButton{
+    fill:white;
+    stroke:black;
+    stroke-width:1px;
+}
+
+.closeButton:hover{
+    fill:red;
+}
+
+.closeButtonText{
+    font-size:28px;
+    font-family: sans-serif;
+    fill:black;
 }
