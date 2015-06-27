@@ -16,7 +16,6 @@ function createGraph(filters, data, type, container){
 			var teams = [filters[0].text, filters[1].text];
 			filteredData = getPerformanceOfTeams(teams, data);
 			return new PieChart(filteredData.title, filteredData.data, container);
-			
 		}
 		if (filters[0].type == "team" && filters[1].type == "venue"){
 			filteredData = getWinningRateVenue(filters[0].text, filters[1].text, data);
@@ -24,7 +23,7 @@ function createGraph(filters, data, type, container){
 		}
 		if (filters[0].type == "team" && filters[1].type == "year"){
 			var filteredData = getTeamScoreOverYears(filters[0].text, null, filters[1].text, data);
-			return new LineGraph(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
+			return new BarChart(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
 		}
 		if (filters[0].type == "team" && filters[1].type == "season"){
 			var filteredData = getTeamScoreOverYears(filters[0].text, filters[1].text, null, data);
@@ -129,6 +128,59 @@ function LineGraph(title, data, minX, minY, maxX, maxY, container){
 	
 }
 
+function BarChart(title, data, minX, minY, maxX, maxY, container){
+	var graphWidth = width - offsetLeft-offsetRight;
+	var graphHeight = 480;
+	var marginTop = 40;
+	
+	var x = d3.scale.linear().domain([minX,maxX]).range([0, graphWidth]);
+	var y = d3.scale.linear().domain([minY,maxY]).range([graphHeight, 0]);
+	
+	var xAxis = d3.svg.axis().scale(x).orient("bottom");
+	var yAxis = d3.svg.axis().scale(y).orient("left");
+	
+	var line = d3.svg.line()
+					.x(function(d) { return x(d.x); })
+					.y(function(d) { return y(d.y); })
+					
+	this.elements = [];
+	
+	this.elements[this.elements.length] = container.append("g")
+											.attr("class","axis")
+											.attr("transform","translate("+offsetLeft+","+(graphHeight+offsetTop+marginTop)+")")
+											.call(xAxis);
+	this.elements[this.elements.length] = container.append("g")
+											.attr("class","axis")
+											.attr("transform","translate("+offsetLeft+","+(offsetTop+marginTop)+")")
+											.call(yAxis);
+											
+	this.elements[this.elements.length] = container.selectAll(".bar")
+		.data(data[0].data)
+		.enter().append("rect")
+					.attr("class", "bar")
+					.attr("x", function(d) { return x(d.x); })
+					.attr("width", 20)
+					.attr("y", function(d) { return y(d.y); })
+					.attr("height", function(d) { return graphHeight - y(d.y); })
+					.attr("fill", COLORS[0])
+					.attr("transform","translate("+offsetLeft+","+(offsetTop+marginTop)+")")
+			
+	this.elements[this.elements.length] = container.append("text")
+											.attr("transform", "translate(" + (graphWidth-60) + "," + (offsetTop+marginTop+100+30) + ")")
+											.attr("dy", ".35em")
+											.attr("text-anchor", "start")
+											.attr("font-size", "80%")
+											.style("fill", COLORS[0])
+											.text(data[0].text);
+	
+	this.elements[this.elements.length] = container.append("text")
+											.attr("text-anchor", "middle")
+											.attr("transform", "translate(" + (graphWidth/2) + "," + offsetTop + ")")
+											.style("font-size", "150%")
+											.text(title);
+	
+}
+
 function PieChart(title, data, container){
 	var graphWidth = width - offsetLeft - offsetRight;
 	var graphHeight = 480;
@@ -193,6 +245,7 @@ function checkSeason(season, round){
  * format: [{year, [{round, score}]}], x-axis is the week, y-axis is the score, each line is for a season
  */
 function getTeamScoreOverYears(teamName, season, year, data){
+	var minScore = Infinity;
 	var maxScore = 0;
 	var minRound = 0;
 	var maxRound = 0;
@@ -201,6 +254,10 @@ function getTeamScoreOverYears(teamName, season, year, data){
 	var filteredData = [];
 	var currentData = [];
 	var currentYear = null;
+	
+	if (season == "final"){
+		minRound = 14;
+	}
 	
 	for (var i = 0; i < data.length; i++){
 		// if it either just has started the iteration, set the current year into the year of the data it is reading
@@ -230,6 +287,9 @@ function getTeamScoreOverYears(teamName, season, year, data){
 					if (data[i].homeTeamScore > maxScore){
 						maxScore = data[i].homeTeamScore;
 					}
+					if (data[i].homeTeamScore < minScore){
+						minScore = data[i].homeTeamScore;
+					}
 					currentRound++;
 				}
 				else if(data[i].awayTeam == teamName){
@@ -240,13 +300,16 @@ function getTeamScoreOverYears(teamName, season, year, data){
 					if (data[i].awayTeamScore > maxScore){
 						maxScore = data[i].awayTeamScore;
 					}
+					if (data[i].awayTeamScore < minScore){
+						minScore = data[i].awayTeamScore;
+					}
 					currentRound++;
 				}
 			}
 		}
 	}
 	
-	return {title:teamName.toUpperCase()+" - THE PERFORMANCE/TOTAL SCORE STATISTICS", data:filteredData, minX:minRound, minY:0, maxX:maxRound+2, maxY:maxScore};
+	return {title:teamName.toUpperCase()+" - THE PERFORMANCE/TOTAL SCORE STATISTICS", data:filteredData, minX:minRound, minY:minScore, maxX:maxRound+2, maxY:maxScore};
 }
 
 /**
