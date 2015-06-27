@@ -4,13 +4,10 @@ function createGraph(filters, data, type, container){
 	if (filters.length == 1){
 		if (filters[0].type == "team"){
 			var filteredData = getTeamScoreOverYears(filters[0].text, null, null, data);
-			console.log(filteredData);
 			return new LineGraph(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
 		}
 		if (filters[0].type == "country"){
 			filteredData = getCountryTeamsPerformance(filters[0].text, null, null, data);
-			console.log(data);
-			console.log(filteredData);
 			return new LineGraph(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
 		}
 	}
@@ -24,6 +21,14 @@ function createGraph(filters, data, type, container){
 		if (filters[0].type == "team" && filters[1].type == "venue"){
 			filteredData = getWinningRateVenue(filters[0].text, filters[1].text, data);
 			return new PieChart(filteredData.title, filteredData.data, container);
+		}
+		if (filters[0].type == "team" && filters[1].type == "year"){
+			var filteredData = getTeamScoreOverYears(filters[0].text, null, filters[1].text, data);
+			return new LineGraph(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
+		}
+		if (filters[0].type == "team" && filters[1].type == "season"){
+			var filteredData = getTeamScoreOverYears(filters[0].text, filters[1].text, null, data);
+			return new LineGraph(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
 		}
 	}
 	if (filters.length == 3){
