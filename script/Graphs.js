@@ -1,13 +1,16 @@
-var COLORS = ["red", "green", "blue", "blueViolet", "coral", "crimson", "brown", "aqua", "cornFlowerBlue", "chartreuse", "chocolate", "darkBlue", "greenYellow", "indigo"];
+var COLORS = ["green", "red", "blue", "blueViolet", "coral", "crimson", "brown", "aqua", "cornFlowerBlue", "chartreuse", "chocolate", "darkBlue", "greenYellow", "indigo"];
 
 function createGraph(filters, data, type, container){
 	if (filters.length == 1){
 		if (filters[0].type == "team"){
-			var filteredData = getTeamScoreOverYearsData(filters[0].text, data);
+			var filteredData = getTeamScoreOverYears(filters[0].text, null, null, data);
+			console.log(filteredData);
 			return new LineGraph(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
 		}
 		if (filters[0].type == "country"){
-			filteredData = getCountryTeamsPerformance(filters[0].text, data);
+			filteredData = getCountryTeamsPerformance(filters[0].text, null, null, data);
+			console.log(data);
+			console.log(filteredData);
 			return new LineGraph(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
 		}
 	}
@@ -23,10 +26,19 @@ function createGraph(filters, data, type, container){
 			return new PieChart(filteredData.title, filteredData.data, container);
 		}
 	}
+	if (filters.length == 3){
+		if (filters[0].type == "team" && filters[1].type == "season" && filters[2].type == "year"){
+			filteredData = getTeamScoreOverYears(filters[0].text, filters[1].text, filters[2].text, data);
+			return new LineGraph(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);
+		}
+		if (filters[0].type == "season" && filters[1].type == "country" && filters[2].type == "year"){
+			filteredData = getCountryTeamsPerformance(filters[1].text, filters[0].text, filters[2].text, data);
+			return new LineGraph(filteredData.title, filteredData.data, filteredData.minX, filteredData.minY, filteredData.maxX, filteredData.maxY, container);			
+		}
+	}
 }
 
 function removeGraph(graph){
-	console.log(graph);
 	for(var i = 0; i < graph.elements.length; i++){
 		graph.elements[i].remove();
 	}
@@ -67,7 +79,8 @@ function LineGraph(title, data, minX, minY, maxX, maxY, container){
 					.attr("stroke",COLORS[lineColorIdx%COLORS.length])
 					.attr("stroke-width",2)
 					.attr("fill", "none")
-					.attr("transform","translate("+offsetLeft+","+(offsetTop+marginTop)+")");
+					.attr("transform","translate("+offsetLeft+","+(offsetTop+marginTop)+")")
+					.style("stroke", function(d) { return COLORS[i]; });
 		
 		var totalLength = path.node().getTotalLength();
 
@@ -77,8 +90,20 @@ function LineGraph(title, data, minX, minY, maxX, maxY, container){
 			.duration(1000)
 			.ease("linear")
 			.attr("stroke-dashoffset", 0);
-						
+			
 		this.elements[this.elements.length] = path;
+			
+		var points = container.selectAll(".point")
+			.data(data[i].data)
+			.enter().append("svg:circle")
+				.attr("stroke", "black")
+				.attr("fill", COLORS[i])
+				.attr("cx", function(d) { return x(d.x); })
+				.attr("cy", function(d) { return y(d.y); })
+				.attr("r", 3)
+				.attr("transform","translate("+offsetLeft+","+(offsetTop+marginTop)+")");
+						
+		this.elements[this.elements.length] = points;
 				
 		this.elements[this.elements.length] = container.append("text")
 												.attr("transform", "translate(" + (graphWidth-60) + "," + (offsetTop+marginTop+100+30*i) + ")")
@@ -148,11 +173,23 @@ function PieChart(title, data, container){
 											.text(title);
 }
 
+function checkSeason(season, round){
+	if (season == "regular"){
+		return (round >= 1 && round <= 14);
+	}
+	else if (season == "final"){
+		minRound = 14;
+		return (round >= 15);
+	}
+	return true;
+}
+
 /**
  * format: [{year, [{round, score}]}], x-axis is the week, y-axis is the score, each line is for a season
  */
-function getTeamScoreOverYearsData(teamName, data){
+function getTeamScoreOverYears(teamName, season, year, data){
 	var maxScore = 0;
+	var minRound = 0;
 	var maxRound = 0;
 	var currentRound = 1;
 	
@@ -172,83 +209,91 @@ function getTeamScoreOverYearsData(teamName, data){
 			currentYear = data[i].year;
 		}
 		
-		//check byes
-		while (data[i].round > currentRound){
-			currentData[currentData.length] = {x:currentRound, y:999};
-			currentRound++;
-		}
+		if (checkSeason(season, data[i].round)){
+			//check byes
+			while (data[i].round > currentRound){
+				currentData[currentData.length] = {x:currentRound, y:999};
+				currentRound++;
+			}	
 		
-		if (data[i].homeTeam == teamName){
-			currentData[currentData.length] = {x:+data[i].round, y:data[i].homeTeamScore};
-			if (+data[i].round > maxRound){
-				maxRound = +data[i].round;
+			if (year == null || year == currentYear){
+				if (data[i].homeTeam == teamName){
+					currentData[currentData.length] = {x:+data[i].round, y:data[i].homeTeamScore};
+					if (+data[i].round > maxRound){
+						maxRound = +data[i].round;
+					}
+					if (data[i].homeTeamScore > maxScore){
+						maxScore = data[i].homeTeamScore;
+					}
+					currentRound++;
+				}
+				else if(data[i].awayTeam == teamName){
+					currentData[currentData.length] = {x:+data[i].round, y:data[i].awayTeamScore};
+					if (+data[i].round > maxRound){
+						maxRound = +data[i].round;
+					}
+					if (data[i].awayTeamScore > maxScore){
+						maxScore = data[i].awayTeamScore;
+					}
+					currentRound++;
+				}
 			}
-			if (data[i].homeTeamScore > maxScore){
-				maxScore = data[i].homeTeamScore;
-			}
-			currentRound++;
-		}
-		else if(data[i].awayTeam == teamName){
-			currentData[currentData.length] = {x:+data[i].round, y:data[i].awayTeamScore};
-			if (+data[i].round > maxRound){
-				maxRound = +data[i].round;
-			}
-			if (data[i].awayTeamScore > maxScore){
-				maxScore = data[i].awayTeamScore;
-			}
-			currentRound++;
 		}
 	}
 	
-	return {title:teamName.toUpperCase()+" - THE PERFORMANCE/TOTAL SCORE STATISTICS", data:filteredData, minX:0, minY:0, maxX:maxRound+2, maxY:maxScore};
+	return {title:teamName.toUpperCase()+" - THE PERFORMANCE/TOTAL SCORE STATISTICS", data:filteredData, minX:minRound, minY:0, maxX:maxRound+2, maxY:maxScore};
 }
 
 /**
  * format: [teamName, [{year, score}]], x-axis is the year, y-axis is the score
  */
-function getCountryTeamsPerformance(country, data){
+function getCountryTeamsPerformance(country, season, year, data){
 	var teams = [];
 	var years = [];
 	var filteredData = [];
 	var teamTotalScore = [];
 	
 	for (var i = 0; i < data.length; i++){
-		if (getTeamCountry(data[i].homeTeam) == country){
-			// add the team name if it is not in the list
-			if (teams.indexOf(data[i].homeTeam) < 0){
-				teams[teams.length] = data[i].homeTeam;	
-			}
-			// add the year when the team plays
-			if (years.indexOf(data[i].year) < 0){
-				years[years.length] = data[i].year;
-			}
-			if (typeof teamTotalScore[data[i].homeTeam] === "undefined"){
-				teamTotalScore[data[i].homeTeam] = [];
-			}
-			if (typeof teamTotalScore[data[i].homeTeam][data[i].year] === "undefined"){
-				teamTotalScore[data[i].homeTeam][data[i].year] = data[i].homeTeamScore;
-			}
-			else {
-				teamTotalScore[data[i].homeTeam] += data[i].homeTeamScore;
-			}
-		}
-		if (getTeamCountry(data[i].awayTeam) == country){
-			// add the team name if it is not in the list
-			if (teams.indexOf(data[i].awayTeam) < 0){
-				teams[teams.length] = data[i].awayTeam;	
-			}
-			// add the year when the team plays
-			if (years.indexOf(data[i].year) < 0){
-				years[years.length] = data[i].year;	
-			}
-			if (typeof teamTotalScore[data[i].awayTeam] === "undefined"){
-				teamTotalScore[data[i].awayTeam] = [];
-			}
-			if (typeof teamTotalScore[data[i].awayTeam][data[i].year] === "undefined"){
-				teamTotalScore[data[i].awayTeam][data[i].year] = data[i].awayTeamScore;
-			}
-			else {
-				teamTotalScore[data[i].awayTeam] += data[i].awayTeamScore;
+		if (year == null || data[i].year == year){
+			if (season == null || checkSeason(season, data[i].round)){
+				if (getTeamCountry(data[i].homeTeam) == country){
+					// add the team name if it is not in the list
+					if (teams.indexOf(data[i].homeTeam) < 0){
+						teams[teams.length] = data[i].homeTeam;	
+					}
+					// add the year when the team plays
+					if (years.indexOf(data[i].year) < 0){
+						years[years.length] = data[i].year;
+					}
+					if (typeof teamTotalScore[data[i].homeTeam] === "undefined"){
+						teamTotalScore[data[i].homeTeam] = [];
+					}
+					if (typeof teamTotalScore[data[i].homeTeam][data[i].year] === "undefined"){
+						teamTotalScore[data[i].homeTeam][data[i].year] = data[i].homeTeamScore;
+					}
+					else {
+						teamTotalScore[data[i].homeTeam][data[i].year] += data[i].homeTeamScore;
+					}
+				}
+				if (getTeamCountry(data[i].awayTeam) == country){
+					// add the team name if it is not in the list
+					if (teams.indexOf(data[i].awayTeam) < 0){
+						teams[teams.length] = data[i].awayTeam;	
+					}
+					// add the year when the team plays
+					if (years.indexOf(data[i].year) < 0){
+						years[years.length] = data[i].year;	
+					}
+					if (typeof teamTotalScore[data[i].awayTeam] === "undefined"){
+						teamTotalScore[data[i].awayTeam] = [];
+					}
+					if (typeof teamTotalScore[data[i].awayTeam][data[i].year] === "undefined"){
+						teamTotalScore[data[i].awayTeam][data[i].year] = data[i].awayTeamScore;
+					}
+					else {
+						teamTotalScore[data[i].awayTeam][data[i].year] += data[i].awayTeamScore;
+					}
+				}
 			}
 		}
 	}
@@ -267,9 +312,7 @@ function getCountryTeamsPerformance(country, data){
 		filteredData[filteredData.length] = {text:teams[i], data:totalPointsPerYear};
 	}
 	
-	console.log(years);
-	
-	return {title:"THE PERFORMANCE/TOTAL SCORE OF EACH TEAM FROM "+country.toUpperCase(), data:filteredData, minX:Math.min.apply(Math, years), minY:0, maxX:Math.max.apply(Math, years)+1, maxY:maxTotalScore};
+	return {title:"THE PERFORMANCE/TOTAL SCORE OF EACH TEAM FROM "+country.toUpperCase(), data:filteredData, minX:Math.min.apply(Math, years)-1, minY:0, maxX:Math.max.apply(Math, years)+1, maxY:maxTotalScore};
 }
 
 /**
