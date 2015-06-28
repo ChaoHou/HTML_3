@@ -3,10 +3,11 @@
 */
 function load(start) {
 	var script = 'var q = queue()'
-	var minYear = 2000;
-	var maxYear = 2099;
+	var minYear = 2008;
+	var maxYear = 2020;
 	for (var i = minYear; i <= maxYear; i++){
 		var file = "data/"+i+"-Table1.csv";
+		console.log(isActiveURL(file));
 		if (isActiveURL(file)){
 			var isError = false;
 			
@@ -23,6 +24,7 @@ function load(start) {
 		}
 		console.log(i);
 		console.log(isError);
+		console.log(script);
 	}
 	script += '.awaitAll(start);';
 	
