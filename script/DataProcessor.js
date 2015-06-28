@@ -7,7 +7,7 @@ function load(start) {
 	var maxYear = 2099;
 	for (var i = minYear; i <= maxYear; i++){
 		var file = "data/"+i+"-Table1.csv";
-		if (isActiveURL(url)){
+		if (isActiveURL(file)){
 			var isError = false;
 			
 			try {
