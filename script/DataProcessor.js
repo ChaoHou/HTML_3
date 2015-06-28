@@ -16,7 +16,7 @@ function load(start) {
 			isError = true;
 		}
 		
-		if (!isError){
+		if (!isError && isActiveURL(file)){
 			script += '.defer(loadData, "'+file+'", '+i+')';
 		}
 	}
@@ -27,6 +27,19 @@ function load(start) {
 	eval(script);
 	
 	return q;
+}
+
+function isActiveURL(url){
+	var request = new XMLHttpRequest();  
+	request.open('GET', 'http://www.mozilla.org', true);
+	request.onreadystatechange = function(){
+		if (request.readyState === 4){
+			if (request.status === 404) {  
+				return false;
+			}  
+		}
+	};
+	return true;
 }
 
 function doesFileExist(urlToFile)
