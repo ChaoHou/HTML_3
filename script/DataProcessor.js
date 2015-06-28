@@ -20,6 +20,8 @@ function load(start) {
 			script += '.defer(loadData, "'+file+'", '+i+')';
 		}
 	}
+	console.log(i);
+	console.log(isError);
 	script += '.awaitAll(start);';
 	
 	eval(script);
