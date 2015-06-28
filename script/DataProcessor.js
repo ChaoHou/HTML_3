@@ -7,21 +7,23 @@ function load(start) {
 	var maxYear = 2099;
 	for (var i = minYear; i <= maxYear; i++){
 		var file = "data/"+i+"-Table1.csv";
-		var isError = false;
-		
-		try {
-			d3.csv(file, function(d){});
+		if (isActiveURL(url)){
+			var isError = false;
+			
+			try {
+				d3.csv(file, function(d){});
+			}
+			catch(err){
+				isError = true;
+			}
+			
+			if (!isError){
+				script += '.defer(loadData, "'+file+'", '+i+')';
+			}
 		}
-		catch(err){
-			isError = true;
-		}
-		
-		if (!isError && isActiveURL(file)){
-			script += '.defer(loadData, "'+file+'", '+i+')';
-		}
+		console.log(i);
+		console.log(isError);
 	}
-	console.log(i);
-	console.log(isError);
 	script += '.awaitAll(start);';
 	
 	eval(script);
