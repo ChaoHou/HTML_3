@@ -2,35 +2,14 @@
     load multiple files, call "start" when loading finished
 */
 function load(start) {
-	var script = 'var q = queue()'
-	var minYear = 2008;
-	var maxYear = 2020;
-	for (var i = minYear; i <= maxYear; i++){
-		var file = "data/"+i+"-Table1.csv";
-		console.log(isActiveURL(file));
-		if (isActiveURL(file)){
-			var isError = false;
-			
-			try {
-				d3.csv(file, function(d){});
-			}
-			catch(err){
-				isError = true;
-			}
-			
-			if (!isError){
-				script += '.defer(loadData, "'+file+'", '+i+')';
-			}
-		}
-		console.log(i);
-		console.log(isError);
-		console.log(script);
-	}
-	script += '.awaitAll(start);';
-	
-	eval(script);
-	
-	return q;
+return queue()
+    .defer(loadData, "data/2008-Table1.csv", 2008)
+    .defer(loadData, "data/2009-Table1.csv", 2009)
+    .defer(loadData, "data/2010-Table1.csv", 2010)
+    .defer(loadData, "data/2011-Table1.csv", 2011)
+    .defer(loadData, "data/2012-Table1.csv", 2012)
+    .defer(loadData, "data/2013-Table1.csv", 2013)
+    .awaitAll(start);
 }
 
 function isActiveURL(url){
@@ -57,6 +36,16 @@ function doesFileExist(urlToFile)
     } else {
         return true;
     }
+=======
+    return queue()
+    .defer(loadData, "data/2008-Table1.csv", 2008)
+    .defer(loadData, "data/2009-Table1.csv", 2009)
+    .defer(loadData, "data/2010-Table1.csv", 2010)
+    .defer(loadData, "data/2011-Table1.csv", 2011)
+    .defer(loadData, "data/2012-Table1.csv", 2012)
+    .defer(loadData, "data/2013-Table1.csv", 2013)
+    .awaitAll(start);
+>>>>>>> parent of 140f955... added functionality to add the data
 }
 
 /*
