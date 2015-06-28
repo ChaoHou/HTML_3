@@ -19,7 +19,7 @@ function createGraph(map, data, type, container) {
     //if country is selected
     if (map.country) {
         //if a year is passed in along with country, draw pie graph
-        if (map.year || (map.season && map.season == "final")) {
+        if (map.year || (map.team1 || (map.season && map.season == "final")) {
             //if the season is final ,draw pie chart, if it is regular, draw line chart
             var drawingData = getWinningPercentageByVenue(map.team1, map.venue, data);
             return new PieChart(drawingData.title, drawingData.data, container);
