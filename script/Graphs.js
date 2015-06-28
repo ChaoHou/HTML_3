@@ -277,7 +277,6 @@ function getTeamScoreOverYears(teamName, season, year, data){
 	var maxScore = 0;
 	var minRound = 0;
 	var maxRound = 0;
-	var currentRound = 1;
 	
 	var filteredData = [];
 	var currentData = [];
@@ -300,11 +299,6 @@ function getTeamScoreOverYears(teamName, season, year, data){
 		}
 		
 		if (checkSeason(season, data[i].round)){
-			//check byes
-			while (data[i].round > currentRound){
-				currentData[currentData.length] = {x:currentRound, y:999};
-				currentRound++;
-			}	
 		
 			if (year == null || year == currentYear){
 				if (data[i].homeTeam == teamName){
@@ -318,7 +312,6 @@ function getTeamScoreOverYears(teamName, season, year, data){
 					if (data[i].homeTeamScore < minScore){
 						minScore = data[i].homeTeamScore;
 					}
-					currentRound++;
 				}
 				else if(data[i].awayTeam == teamName){
 					currentData[currentData.length] = {x:+data[i].round, y:data[i].awayTeamScore};
@@ -331,7 +324,6 @@ function getTeamScoreOverYears(teamName, season, year, data){
 					if (data[i].awayTeamScore < minScore){
 						minScore = data[i].awayTeamScore;
 					}
-					currentRound++;
 				}
 			}
 		}
