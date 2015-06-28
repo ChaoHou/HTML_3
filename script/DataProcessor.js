@@ -2,14 +2,42 @@
     load multiple files, call "start" when loading finished
 */
 function load(start) {
-    return queue()
-    .defer(loadData, "data/2008-Table1.csv", 2008)
-    .defer(loadData, "data/2009-Table1.csv", 2009)
-    .defer(loadData, "data/2010-Table1.csv", 2010)
-    .defer(loadData, "data/2011-Table1.csv", 2011)
-    .defer(loadData, "data/2012-Table1.csv", 2012)
-    .defer(loadData, "data/2013-Table1.csv", 2013)
-    .awaitAll(start);
+	var script = 'var q = queue()'
+	var minYear = 2000;
+	var maxYear = 2099;
+	for (var i = minYear; i <= maxYear; i++){
+		var file = "data/"+i+"-Table1.csv";
+		var isError = false;
+		
+		try {
+			d3.csv(file, function(d){});
+		}
+		catch(err){
+			isError = true;
+		}
+		
+		if (!isError){
+			script += '.defer(loadData, "'+file+'", '+i+')';
+		}
+	}
+	script += '.awaitAll(start);';
+	
+	eval(script);
+	
+	return q;
+}
+
+function doesFileExist(urlToFile)
+{
+    var xhr = new XMLHttpRequest();
+    xhr.open('HEAD', urlToFile, false);
+    xhr.send();
+     
+    if (xhr.status == "404") {
+        return false;
+    } else {
+        return true;
+    }
 }
 
 /*
