@@ -35,7 +35,7 @@ function load(start) {
 
 function isActiveURL(url){
 	var request = new XMLHttpRequest();  
-	request.open('GET', 'http://www.mozilla.org', true);
+	request.open('GET', url, true);
 	request.onreadystatechange = function(){
 		if (request.readyState === 4){
 			if (request.status === 404) {  
