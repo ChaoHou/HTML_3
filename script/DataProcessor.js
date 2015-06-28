@@ -12,42 +12,6 @@ return queue()
     .awaitAll(start);
 }
 
-function isActiveURL(url){
-	var request = new XMLHttpRequest();  
-	request.open('GET', url, true);
-	request.onreadystatechange = function(){
-		if (request.readyState === 4){
-			if (request.status === 404) {  
-				return false;
-			}  
-		}
-	};
-	return true;
-}
-
-function doesFileExist(urlToFile)
-{
-    var xhr = new XMLHttpRequest();
-    xhr.open('HEAD', urlToFile, false);
-    xhr.send();
-     
-    if (xhr.status == "404") {
-        return false;
-    } else {
-        return true;
-    }
-=======
-    return queue()
-    .defer(loadData, "data/2008-Table1.csv", 2008)
-    .defer(loadData, "data/2009-Table1.csv", 2009)
-    .defer(loadData, "data/2010-Table1.csv", 2010)
-    .defer(loadData, "data/2011-Table1.csv", 2011)
-    .defer(loadData, "data/2012-Table1.csv", 2012)
-    .defer(loadData, "data/2013-Table1.csv", 2013)
-    .awaitAll(start);
->>>>>>> parent of 140f955... added functionality to add the data
-}
-
 /*
     construct data from the loaded files.
 */
